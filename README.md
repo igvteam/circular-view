@@ -1,2 +1,3 @@
 # circular-view
-Wrapper class for jBrowse genomic circular view component
+
+A wrapper class for jBrowse genomic circular view component for use by IGV projects.  
