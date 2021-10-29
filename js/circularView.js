@@ -27,6 +27,7 @@ class CircularView {
                 JBrowseCircularGenomeView,
             } = JBrowseReactCircularGenomeView;
 
+            this.container = div;
 
             this.chrNames = new Set();
             const regions = [];
@@ -76,7 +77,9 @@ class CircularView {
             this.viewState.config.tracks[0].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
             //this.viewState.config.tracks[0].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
 
-            this.onChordClick = config.onChordClick;
+            if(config.onChordClick) {
+                this.onChordClick(config.onChordClick)
+            }
 
             const element = createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
             this.setSize(div.clientWidth);
@@ -180,10 +183,22 @@ class CircularView {
         );
     }
 
+    show() {
+        this.container.style.display = 'block'
+    }
+
+    hide() {
+        this.container.style.display = 'none'
+    }
+
 }
 
 function shortChrName(chrName) {
     return chrName.startsWith("chr") ? chrName.substring(3) : chrName;
+}
+
+function defaultOnChordClick(feature, chordTrack, pluginManager) {
+    console.log(feature);
 }
 
 
