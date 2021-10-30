@@ -20,75 +20,89 @@ class CircularView {
 
         if (CircularView.isInstalled()) {
 
-            const {createElement} = React
-            const {render} = ReactDOM
-            const {
-                createViewState,
-                JBrowseCircularGenomeView,
-            } = JBrowseReactCircularGenomeView;
-
             this.container = div;
+            this.config = config;
 
-            this.chrNames = new Set();
-            const regions = [];
-            const colors = [];
-            for (let chr of config.chromosomes) {
-                const shortName = shortChrName(chr.name);
-                this.chrNames.add(shortName);
-                colors.push(chr.color || getChrColor(shortName));
-                regions.push(
-                    {
-                        refName: shortName,
-                        uniqueId: shortName,
-                        start: 0,
-                        end: chr.bpLength
-                    }
-                )
+            if (config.assembly) {
+                this.setAssembly(config.assembly)
             }
-
-            this.viewState = createViewState({
-                assembly: {
-                    name: 'forIGV',
-                    sequence: {
-                        trackId: 'refSeqTrack',
-                        type: 'ReferenceSequenceTrack',
-                        adapter: {
-                            type: 'FromConfigSequenceAdapter',
-                            features: regions,
-                        },
-                    },
-                    refNameColors: colors
-                },
-                tracks: [
-                    {
-                        trackId: 'firstTrack',
-                        name: 'A Track',
-                        assemblyNames: ['forIGV'],
-                        type: 'VariantTrack',
-                        adapter: {
-                            type: 'FromConfigAdapter',
-                            features: [],
-                        },
-                    },
-                ],
-            });
-
-            // Set view colors
-            this.viewState.config.tracks[0].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
-            //this.viewState.config.tracks[0].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
-
-            if(config.onChordClick) {
-                this.onChordClick(config.onChordClick)
-            }
-
-            const element = createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
-            this.setSize(div.clientWidth);
-            render(element, div);
 
         } else {
             console.error("JBrowse circular view is not installed");
         }
     }
+
+    setAssembly(igvGenome) {
+
+        const {createElement} = React
+        const {render} = ReactDOM
+        const {
+            createViewState,
+            JBrowseCircularGenomeView,
+        } = JBrowseReactCircularGenomeView;
+
+        // Remove all children from possible previously assemblies.  React might do this for us when we render, but just in case.
+        ReactDOM.unmountComponentAtNode(this.container);
+
+        this.chrNames = new Set();
+        const regions = [];
+        const colors = [];
+
+        for (let chr of igvGenome.chromosomes) {
+            const shortName = shortChrName(chr.name);
+            this.chrNames.add(shortName);
+            colors.push(chr.color || getChrColor(shortName));
+            regions.push(
+                {
+                    refName: shortName,
+                    uniqueId: shortName,
+                    start: 0,
+                    end: chr.bpLength
+                }
+            )
+        }
+
+        this.viewState = createViewState({
+            assembly: {
+                name: igvGenome.name,
+                sequence: {
+                    trackId: igvGenome.id,
+                    type: 'ReferenceSequenceTrack',
+                    adapter: {
+                        type: 'FromConfigSequenceAdapter',
+                        features: regions,
+                    },
+                },
+                refNameColors: colors
+            },
+            tracks: [
+                {
+                    trackId: 'firstTrack',
+                    name: 'A Track',
+                    assemblyNames: ['forIGV'],
+                    type: 'VariantTrack',
+                    adapter: {
+                        type: 'FromConfigAdapter',
+                        features: [],
+                    },
+                },
+            ],
+        });
+
+        // Set view colors
+        this.viewState.config.tracks[0].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
+        //this.viewState.config.tracks[0].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
+
+        if (this.config.onChordClick) {
+            this.onChordClick(this.config.onChordClick)
+        }
+
+        this.element = createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
+        this.setSize(this.container.clientWidth);
+        render(this.element, this.container);
+
+    }
+
 
     /**
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
@@ -100,6 +114,7 @@ class CircularView {
         view.setHeight(size /* this is the height of the area inside the border in pixels */);
         view.setBpPerPx(view.minBpPerPx);
     }
+
 
     /**
      * Append or replace current set of chords
@@ -138,19 +153,19 @@ class CircularView {
     }
 
     //
-    // addTrack(name, chords) {
-    //     const track = {
-    //         trackId: name,
-    //         name: name,
-    //         assemblyNames: ['forIGV'],
-    //         type: 'VariantTrack',
-    //         adapter: {
-    //             type: 'FromConfigAdapter',
-    //             features: chords,
-    //         }
-    //     }
-    //     this.viewState.config.tracks.push(track);  // <<< DOESN't WORK
-    // }
+    addTrack(name, chords) {
+        const track = {
+            trackId: name,
+            name: name,
+            assemblyNames: ['forIGV'],
+            type: 'VariantTrack',
+            adapter: {
+                type: 'FromConfigAdapter',
+                features: chords,
+            }
+        }
+        this.viewState.config.tracks.push(track);  // <<< DOESN't WORK
+    }
 
     clearChords() {
         this.viewState.config.tracks[0].adapter.features.set([]);
