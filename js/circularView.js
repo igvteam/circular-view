@@ -12,12 +12,12 @@ class CircularView {
      * @param div
      * @param config - configuration options
      *   {
-     *       chromosomes: <array of chromosome objects {name, bpLength, color (optional)}>  *REQUIRED
+     *       chromosomes: <array of chromosome objects {name, bpLength, color (optional)}>  *OPTIONAL
      *       onChordClick: function called upon chord click with chord feature as argument  *OPTIONAL
      *   }
      */
     constructor(div, config) {
-
+        config = config || {}
         if (CircularView.isInstalled()) {
 
             this.container = div;
@@ -32,10 +32,29 @@ class CircularView {
         }
     }
 
+    /**
+     * Reset view with a new set of chromosomes.
+     *
+     * @param igvGenome
+     * {
+     *     name: <string>,
+     *     id: <string>,
+     *     chromosomes: [
+     *         {
+     *             name, <string>,
+     *             bpLength: <integer>,
+     *             color: <string>  *OPTIONAL
+     *         }
+     *     ]
+     *
+     * }
+     */
     setAssembly(igvGenome) {
 
-        const {createElement} = React
-        const {render} = ReactDOM
+        if(this.genomeId === igvGenome.id) {
+            return;
+        }
+
         const {
             createViewState,
             JBrowseCircularGenomeView,
@@ -44,6 +63,7 @@ class CircularView {
         // Remove all children from possible previously assemblies.  React might do this for us when we render, but just in case.
         ReactDOM.unmountComponentAtNode(this.container);
 
+        this.genomeId = igvGenome.id;
         this.chrNames = new Set();
         const regions = [];
         const colors = [];
@@ -97,10 +117,12 @@ class CircularView {
             this.onChordClick(this.config.onChordClick)
         }
 
-        this.element = createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
+        this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
         this.setSize(this.container.clientWidth);
-        render(this.element, this.container);
 
+        ReactDOM.render(this.element, this.container);
+
+        this.hideTrackSelectButton();
     }
 
 
@@ -108,11 +130,13 @@ class CircularView {
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
     setSize(size) {
-        size -= 45;
-        const view = this.viewState.session.view;
-        view.setWidth(size);
-        view.setHeight(size /* this is the height of the area inside the border in pixels */);
-        view.setBpPerPx(view.minBpPerPx);
+        if(this.viewState) {
+            size -= 45;
+            const view = this.viewState.session.view;
+            view.setWidth(size);
+            view.setHeight(size /* this is the height of the area inside the border in pixels */);
+            view.setBpPerPx(view.minBpPerPx);
+        }
     }
 
 
@@ -205,6 +229,23 @@ class CircularView {
     hide() {
         this.container.style.display = 'none'
     }
+
+    hideTrackSelectButton() {
+        // Hack to hide track menu, which has no relevance to IGV.   The "render" function is async and takes time,
+        // with no way to be notified when its finished (the callback argument is called immediately).
+        setTimeout(() => {
+            let trackButton = this.container.querySelector("button[data-testid='circular_track_select']");
+            if (trackButton) {
+                trackButton.style.display = 'none';
+            } else {
+                if(CircularView.hideSelectAttempts++ < 5) {
+                    this.hideTrackSelectButton();
+                }
+            }
+        }, 100);
+    }
+
+    static hideSelectAttempts = 0;
 
 }
 
