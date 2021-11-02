@@ -222,12 +222,26 @@ class CircularView {
         );
     }
 
+    /**
+     * Deprecated, use "visible" property
+     */
     show() {
-        this.container.style.display = 'block'
+        this.container.style.display = 'block';
     }
 
+    /**
+     * Deprecated, use "visible" property
+     */
     hide() {
-        this.container.style.display = 'none'
+        this.container.style.display = 'none';
+    }
+
+    get visible() {
+        return this.container.style.display === 'block';
+    }
+
+    set visible(isVisible) {
+        this.container.style.display = isVisible ? 'block' : 'none';
     }
 
     hideTrackSelectButton() {
@@ -238,14 +252,14 @@ class CircularView {
             if (trackButton) {
                 trackButton.style.display = 'none';
             } else {
-                if(CircularView.hideSelectAttempts++ < 5) {
+                if(CircularView.hideTrackSelectedAttempts++ < 5) {
                     this.hideTrackSelectButton();
                 }
             }
         }, 100);
     }
 
-    static hideSelectAttempts = 0;
+    static hideTrackSelectedAttempts = 0;
 
 }
 
