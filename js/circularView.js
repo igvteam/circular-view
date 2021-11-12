@@ -27,74 +27,25 @@ class CircularView {
                 this.setAssembly(config.assembly)
             }
 
+            this.chords = config.chords || [];
+
         } else {
             console.error("JBrowse circular view is not installed");
         }
     }
 
-    /**
-     * Reset view with a new set of chromosomes.
-     *
-     * @param igvGenome
-     * {
-     *     name: <string>,
-     *     id: <string>,
-     *     chromosomes: [
-     *         {
-     *             name, <string>,
-     *             bpLength: <integer>,
-     *             color: <string>  *OPTIONAL
-     *         }
-     *     ]
-     *
-     * }
-     */
-    setAssembly(igvGenome) {
-
-        if(this.genomeId === igvGenome.id) {
-            return;
-        }
+    render() {
 
         const {
             createViewState,
             JBrowseCircularGenomeView,
         } = JBrowseReactCircularGenomeView;
 
-        // Remove all children from possible previously assemblies.  React might do this for us when we render, but just in case.
+        // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
         ReactDOM.unmountComponentAtNode(this.container);
 
-        this.genomeId = igvGenome.id;
-        this.chrNames = new Set();
-        const regions = [];
-        const colors = [];
-
-        for (let chr of igvGenome.chromosomes) {
-            const shortName = shortChrName(chr.name);
-            this.chrNames.add(shortName);
-            colors.push(chr.color || getChrColor(shortName));
-            regions.push(
-                {
-                    refName: shortName,
-                    uniqueId: shortName,
-                    start: 0,
-                    end: chr.bpLength
-                }
-            )
-        }
-
         this.viewState = createViewState({
-            assembly: {
-                name: igvGenome.name,
-                sequence: {
-                    trackId: igvGenome.id,
-                    type: 'ReferenceSequenceTrack',
-                    adapter: {
-                        type: 'FromConfigSequenceAdapter',
-                        features: regions,
-                    },
-                },
-                refNameColors: colors
-            },
+            assembly: this.assembly,
             tracks: [
                 {
                     trackId: 'firstTrack',
@@ -103,7 +54,7 @@ class CircularView {
                     type: 'VariantTrack',
                     adapter: {
                         type: 'FromConfigAdapter',
-                        features: [],
+                        features: this.chords,
                     },
                 },
             ],
@@ -113,24 +64,49 @@ class CircularView {
         this.viewState.config.tracks[0].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
         //this.viewState.config.tracks[0].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
 
-        if (this.config.onChordClick) {
-            this.onChordClick(this.config.onChordClick)
-        }
-
         this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
         this.setSize(this.container.clientWidth);
 
         ReactDOM.render(this.element, this.container);
 
+        if(this.chords) {
+            this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
+            if (this.config.onChordClick) {
+                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick);
+                this.viewState.config.tracks[0].displays[0].onChordClick.set(
+                    'jexl:onChordClick(feature, track, pluginManager)'
+                );
+            }
+        }
+
         this.hideTrackSelectButton();
     }
+
+    /**
+     * Reset view with a new set of chromosomes.
+     */
+    setAssembly(igvGenome) {
+
+        if (this.genomeId === igvGenome.id) {
+            return;
+        }
+
+        this.chords = [];
+        this.genomeId = igvGenome.id;
+        this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)));
+        this.assembly = createAssembly(igvGenome);
+
+        this.render();
+
+    }
+
 
 
     /**
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
     setSize(size) {
-        if(this.viewState) {
+        if (this.viewState) {
             size -= 45;
             const view = this.viewState.session.view;
             view.setWidth(size);
@@ -139,6 +115,10 @@ class CircularView {
         }
     }
 
+
+    getSize() {
+        return this.container.clientWidth;
+    }
 
     /**
      * Append or replace current set of chords
@@ -162,7 +142,11 @@ class CircularView {
      * @param append
      */
     addChords(newChords, append) {
-        const chords = append ? [...this.viewState.config.tracks[0].adapter.features.value] : [];
+
+        if(!append) {
+            this.chords = [];
+        }
+        const chords = this.chords;
         const currentIDs = new Set(chords.map(c => c.uniqueId));
         for (let c of newChords) {
             if (!currentIDs.has(c.uniqueId) &&
@@ -172,8 +156,10 @@ class CircularView {
                 currentIDs.add(c.uniqueId);
             }
         }
-        this.viewState.config.tracks[0].adapter.features.set(chords);
-        this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
+        this.chords = chords;
+        this.render();
+       // this.viewState.config.tracks[0].adapter.features.set(chords);
+       // this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
     }
 
     //
@@ -215,13 +201,6 @@ class CircularView {
         }
     }
 
-    onChordClick(callback) {
-        this.viewState.pluginManager.jexl.addFunction('onChordClick', callback);
-        this.viewState.config.tracks[0].displays[0].onChordClick.set(
-            'jexl:onChordClick(feature, track, pluginManager)'
-        );
-    }
-
     /**
      * Deprecated, use "visible" property
      */
@@ -252,7 +231,7 @@ class CircularView {
             if (trackButton) {
                 trackButton.style.display = 'none';
             } else {
-                if(CircularView.hideTrackSelectedAttempts++ < 5) {
+                if (CircularView.hideTrackSelectedAttempts++ < 5) {
                     this.hideTrackSelectButton();
                 }
             }
@@ -269,6 +248,54 @@ function shortChrName(chrName) {
 
 function defaultOnChordClick(feature, chordTrack, pluginManager) {
     console.log(feature);
+}
+
+/**
+ * @param igvGenome
+ * {
+ *     name: string,
+ *     id: string,
+ *     chromosomes: [
+ *         {
+ *             name, string,
+ *             bpLength: integer,
+ *             color: string *OPTIONAL
+ *         }
+ *     ]
+ * }
+ *
+ * @returns {sequence: {adapter: {features: [], type: string}, trackId: *, type: string}, name: string, refNameColors: []}
+ */
+function createAssembly(igvGenome) {
+
+    const regions = [];
+    const colors = [];
+
+    for (let chr of igvGenome.chromosomes) {
+        const shortName = shortChrName(chr.name);
+        colors.push(chr.color || getChrColor(shortName));
+        regions.push(
+            {
+                refName: shortName,
+                uniqueId: shortName,
+                start: 0,
+                end: chr.bpLength
+            }
+        )
+    }
+
+    return {
+        name: igvGenome.name,
+        sequence: {
+            trackId: igvGenome.id,
+            type: 'ReferenceSequenceTrack',
+            adapter: {
+                type: 'FromConfigSequenceAdapter',
+                features: regions,
+            },
+        },
+        refNameColors: colors
+    }
 }
 
 

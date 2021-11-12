@@ -2,3 +2,6 @@
 .npm
 
 /circular-view.iml
+/app/build/
+/app/node_modules/
+/app/package-lock.json
