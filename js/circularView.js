@@ -178,6 +178,7 @@ class CircularView {
     }
 
     clearChords() {
+        this.chords = [];
         this.viewState.config.tracks[0].adapter.features.set([]);
         this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
     }
