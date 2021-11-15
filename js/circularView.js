@@ -197,6 +197,9 @@ class CircularView {
 
     set visible(isVisible) {
         this.container.style.display = isVisible ? 'block' : 'none';
+        if (isVisible) {
+            this.render();
+        }
     }
 
     hideTrack(trackName) {
