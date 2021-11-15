@@ -25,10 +25,11 @@
 <p>
     <button id="hg19">Genome hg19</button>
     <button id="mm10">Genome mm10</button>
-    <button id="addChords">Add chords</button>
+    <button id="sniffles">Sniffles</button>
+    <button id="delly">Delly</button>
 </p>
 
-<div id="jbrowse_circular_genome_view" style="width: 800px; height: 800px; border: maroon; border-style: dotted;" ></div>
+<div id="jbrowse_circular_genome_view" style="width: 800px; height: 800px; border: maroon; border-style: dotted;"></div>
 
 <script type="module">
 
@@ -36,7 +37,8 @@
 
     import hg19 from "./hg19.js";
     import mm10 from "./mm10.js"
-    import chords from "./chords.js";
+    import snifflesTrack from "./snifflesTrack.js";
+    import dellyTrack from "./dellyTrack.js";
 
     const el = document.getElementById('jbrowse_circular_genome_view');
     const config = {
@@ -57,7 +59,22 @@
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
-    document.getElementById("addChords").addEventListener("click", e => circularView.addChords(chords));
+    document.getElementById("sniffles").addEventListener("click", e => toggleTrack(e, snifflesTrack));
+    document.getElementById("delly").addEventListener("click", e => toggleTrack(e, dellyTrack));
+
+    function toggleTrack(e, track) {
+        const t = circularView.getTrack(track.name);
+        if(!t) {
+            e.target.style.backgroundColor = track.color;
+            circularView.addChords(track.chords, {track: track.name, color: track.color})
+        } else {
+            if(t.visible) {
+                circularView.hideTrack(track.name);
+            } else {
+                circularView.showTrack(track.name);
+            }
+        }
+    }
 
 </script>
 

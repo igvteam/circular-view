@@ -12,8 +12,8 @@ class CircularView {
      * @param div
      * @param config - configuration options
      *   {
-     *       chromosomes: <array of chromosome objects {name, bpLength, color (optional)}>  *OPTIONAL
-     *       onChordClick: function called upon chord click with chord feature as argument  *OPTIONAL
+     *       assembly: {name: string, id: string, chromosomes: [{name: string, bpLength: integer, color: string}]
+     *       onChordClick: function called upon chord click with chord feature as argument
      *   }
      */
     constructor(div, config) {
@@ -27,79 +27,111 @@ class CircularView {
                 this.setAssembly(config.assembly)
             }
 
-            this.chords = config.chords || [];
+            this.tracks = [];
 
         } else {
             console.error("JBrowse circular view is not installed");
         }
     }
 
-    render() {
-
-        const {
-            createViewState,
-            JBrowseCircularGenomeView,
-        } = JBrowseReactCircularGenomeView;
-
-        // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
-        ReactDOM.unmountComponentAtNode(this.container);
-
-        this.viewState = createViewState({
-            assembly: this.assembly,
-            tracks: [
-                {
-                    trackId: 'firstTrack',
-                    name: 'A Track',
-                    assemblyNames: ['forIGV'],
-                    type: 'VariantTrack',
-                    adapter: {
-                        type: 'FromConfigAdapter',
-                        features: this.chords,
-                    },
-                },
-            ],
-        });
-
-        // Set view colors
-        this.viewState.config.tracks[0].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
-        //this.viewState.config.tracks[0].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
-
-        this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
-        this.setSize(this.container.clientWidth);
-
-        ReactDOM.render(this.element, this.container);
-
-        if(this.chords) {
-            this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
-            if (this.config.onChordClick) {
-                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick);
-                this.viewState.config.tracks[0].displays[0].onChordClick.set(
-                    'jexl:onChordClick(feature, track, pluginManager)'
-                );
-            }
-        }
-
-        this.hideTrackSelectButton();
-    }
-
     /**
      * Reset view with a new set of chromosomes.
+     *
+     * @param igvGenome {name: string, id: string, chromosomes: [{name: string, bpLength: integer, color: string}
      */
     setAssembly(igvGenome) {
 
         if (this.genomeId === igvGenome.id) {
             return;
         }
-
-        this.chords = [];
+        this.tracks = [];
         this.genomeId = igvGenome.id;
         this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)));
-        this.assembly = createAssembly(igvGenome);
+
+        const regions = [];
+        const colors = [];
+        for (let chr of igvGenome.chromosomes) {
+            const shortName = shortChrName(chr.name);
+            colors.push(chr.color || getChrColor(shortName));
+            regions.push(
+                {
+                    refName: shortName,
+                    uniqueId: shortName,
+                    start: 0,
+                    end: chr.bpLength
+                }
+            )
+        }
+
+        this.assembly = {
+            name: igvGenome.name,
+            sequence: {
+                trackId: igvGenome.id,
+                type: 'ReferenceSequenceTrack',
+                adapter: {
+                    type: 'FromConfigSequenceAdapter',
+                    features: regions,
+                },
+            },
+            refNameColors: colors
+        }
 
         this.render();
 
     }
 
+    /**
+     * Append or replace current set of chords to the global set or a specific track.
+     *
+     * @param newChords array of chord feature objects.  Example:
+     * [
+     *   {
+     *     "uniqueId": "chr1:129763372-129763376_chr1:129806775-129806790",
+     *     "color": "rgba(0, 0, 255, 0.1)",
+     *     "refName": "1",
+     *     "start": 129763372,
+     *     "end": 129763376,
+     *     "mate": {
+     *       "refName": "2",
+     *       "start": 129806775,
+     *       "end": 129806790
+     *     }
+     *   }
+     * ]
+     * @param options {
+     *     name: string,    // Track name
+     *     color: string,   // Track color
+     *     append: boolean  // Replace or append chords to current set.  Default is append (true)
+     * }
+     */
+
+    addChords(newChords, options = {}) {
+
+        const name = options.track || options.name || "*";
+        const color = options.color || "black";
+
+        let track = this.tracks.find(t => name === t.name);
+        if (track && options.color) {
+            track.color = options.color;  // Override
+        } else if (!track) {
+            track = {name: name, chords: [], color: color, visible: true, id: guid()}
+            this.tracks.push(track);
+        }
+        const chords = false !== options.append ? track.chords : [];
+
+        const currentIDs = new Set(chords.map(c => c.uniqueId));
+        for (let c of newChords) {
+            if (!currentIDs.has(c.uniqueId) &&
+                this.chrNames.has(shortChrName(c.refName)) &&
+                this.chrNames.has(shortChrName(c.mate.refName))) {
+                chords.push(c);
+                currentIDs.add(c.uniqueId);
+            }
+        }
+        this.render();
+        // this.viewState.config.tracks[0].adapter.features.set(chords);
+        // this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
+    }
 
 
     /**
@@ -120,67 +152,10 @@ class CircularView {
         return this.container.clientWidth;
     }
 
-    /**
-     * Append or replace current set of chords
-     *
-     * @param newChords array of chord feature objects.  Example:
-     * [
-     *   {
-     *     "uniqueId": "chr1:129763372-129763376_chr1:129806775-129806790",
-     *     "color": "rgba(0, 0, 255, 0.1)",
-     *     "refName": "1",
-     *     "start": 129763372,
-     *     "end": 129763376,
-     *     "mate": {
-     *       "refName": "2",
-     *       "start": 129806775,
-     *       "end": 129806790
-     *     }
-     *   },
-     *   ....
-     * ]
-     * @param append
-     */
-    addChords(newChords, append) {
-
-        if(!append) {
-            this.chords = [];
-        }
-        const chords = this.chords;
-        const currentIDs = new Set(chords.map(c => c.uniqueId));
-        for (let c of newChords) {
-            if (!currentIDs.has(c.uniqueId) &&
-                this.chrNames.has(shortChrName(c.refName)) &&
-                this.chrNames.has(shortChrName(c.mate.refName))) {
-                chords.push(c);
-                currentIDs.add(c.uniqueId);
-            }
-        }
-        this.chords = chords;
-        this.render();
-       // this.viewState.config.tracks[0].adapter.features.set(chords);
-       // this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
-    }
-
-    //
-    addTrack(name, chords) {
-        const track = {
-            trackId: name,
-            name: name,
-            assemblyNames: ['forIGV'],
-            type: 'VariantTrack',
-            adapter: {
-                type: 'FromConfigAdapter',
-                features: chords,
-            }
-        }
-        this.viewState.config.tracks.push(track);  // <<< DOESN't WORK
-    }
 
     clearChords() {
-        this.chords = [];
-        this.viewState.config.tracks[0].adapter.features.set([]);
-        this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
+        this.tracks = [];
+        this.render();
     }
 
     clearSelection() {
@@ -224,6 +199,97 @@ class CircularView {
         this.container.style.display = isVisible ? 'block' : 'none';
     }
 
+    hideTrack(trackName) {
+        let track = this.tracks.find(t => trackName === t.name);
+        if (track) {
+            track.visible = false;
+            this.render();
+        } else {
+            console.warn(`No track with name: ${name}`)
+        }
+    }
+
+    showTrack(trackName) {
+        let idx = this.tracks.findIndex(t => trackName === t.name);
+        if (idx >= 0) {
+            const track = this.tracks[idx];
+            track.visible = true;
+            this.tracks.splice(idx, 1);   // Change z-order
+            this.tracks.push(track);
+            this.render();
+        } else {
+            console.warn(`No track with name: ${name}`)
+        }
+    }
+
+    getTrack(trackName) {
+        return this.tracks.find(t => trackName === t.name);
+    }
+
+
+    /**
+     * The main render function.  Render here means build the React DOM.  Trying to change react state dynamically
+     * has been buggy, so we completely rebuild the DOM ("render") on any state change.
+     */
+    render() {
+
+        const {
+            createViewState,
+            JBrowseCircularGenomeView,
+        } = JBrowseReactCircularGenomeView;
+
+        // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
+        ReactDOM.unmountComponentAtNode(this.container);
+
+        const visibleTracks = this.tracks.filter(t => false !== t.visible);
+
+        const jbrowseTracks = [];
+        const colors = [];
+        for (let trackConfig of visibleTracks) {
+            jbrowseTracks.push({
+                trackId: trackConfig.id,
+                name: trackConfig.name,
+                assemblyNames: ['forIGV'],
+                type: 'VariantTrack',
+                adapter: {
+                    type: 'FromConfigAdapter',
+                    features: trackConfig.chords,
+                }
+            })
+            colors.push(trackConfig.color);
+        }
+
+        this.viewState = createViewState({
+            assembly: this.assembly,
+            tracks: jbrowseTracks,
+        });
+
+        // Set view colors
+        for (let i = 0; i < visibleTracks.length; i++) {
+            this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set(colors[i]);
+            //this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
+            //this.viewState.config.tracks[i].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
+        }
+
+        this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
+        this.setSize(this.container.clientWidth);
+
+        ReactDOM.render(this.element, this.container);
+
+        for (let i = 0; i < visibleTracks.length; i++) {
+            this.viewState.session.view.showTrack(this.viewState.config.tracks[i].trackId);
+            if (this.config.onChordClick) {
+                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick);
+                this.viewState.config.tracks[i].displays[0].onChordClick.set(
+                    'jexl:onChordClick(feature, track, pluginManager)'
+                );
+            }
+        }
+
+        //this.hideTrackSelectButton();
+    }
+
+
     hideTrackSelectButton() {
         // Hack to hide track menu, which has no relevance to IGV.   The "render" function is async and takes time,
         // with no way to be notified when its finished (the callback argument is called immediately).
@@ -251,52 +317,9 @@ function defaultOnChordClick(feature, chordTrack, pluginManager) {
     console.log(feature);
 }
 
-/**
- * @param igvGenome
- * {
- *     name: string,
- *     id: string,
- *     chromosomes: [
- *         {
- *             name, string,
- *             bpLength: integer,
- *             color: string *OPTIONAL
- *         }
- *     ]
- * }
- *
- * @returns {sequence: {adapter: {features: [], type: string}, trackId: *, type: string}, name: string, refNameColors: []}
- */
-function createAssembly(igvGenome) {
 
-    const regions = [];
-    const colors = [];
-
-    for (let chr of igvGenome.chromosomes) {
-        const shortName = shortChrName(chr.name);
-        colors.push(chr.color || getChrColor(shortName));
-        regions.push(
-            {
-                refName: shortName,
-                uniqueId: shortName,
-                start: 0,
-                end: chr.bpLength
-            }
-        )
-    }
-
-    return {
-        name: igvGenome.name,
-        sequence: {
-            trackId: igvGenome.id,
-            type: 'ReferenceSequenceTrack',
-            adapter: {
-                type: 'FromConfigSequenceAdapter',
-                features: regions,
-            },
-        },
-        refNameColors: colors
-    }
+function guid() {
+    return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
 }
 
 
