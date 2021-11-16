@@ -1,4 +1,5 @@
 export default {
+    "id": "delly",
     "name": "Delly",
     "color": "rgba(0,0,255, 0.5)",
     "chords":

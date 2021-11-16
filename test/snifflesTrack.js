@@ -1,4 +1,5 @@
 export default {
+    "id": "sniffles",
     "name": "Sniffles",
     "color": "rgba(0,150,0, 0.5)",
     "chords":

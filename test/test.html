@@ -68,15 +68,17 @@
     document.getElementById("delly").addEventListener("click", e => toggleTrack(e, dellyTrack));
 
     function toggleTrack(e, track) {
-        const t = circularView.getTrack(track.name);
+        const t = circularView.getTrack(track.id);
         if(!t) {
+            // Load
             e.target.style.backgroundColor = track.color;
-            circularView.addChords(track.chords, {track: track.name, color: track.color})
+            circularView.addChords(track.chords, track)
         } else {
+            // Toggle visibility
             if(t.visible) {
-                circularView.hideTrack(track.name);
+                circularView.hideTrack(track.id);
             } else {
-                circularView.showTrack(track.name);
+                circularView.showTrack(track.id);
             }
         }
     }

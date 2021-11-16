@@ -114,7 +114,7 @@ class CircularView {
         if (track && options.color) {
             track.color = options.color;  // Override
         } else if (!track) {
-            track = {name: name, chords: [], color: color, visible: true, id: guid()}
+            track = {name: name, chords: [], color: color, visible: true, id: options.id || guid()}
             this.tracks.push(track);
         }
         const chords = false !== options.append ? track.chords : [];
@@ -202,8 +202,8 @@ class CircularView {
         }
     }
 
-    hideTrack(trackName) {
-        let track = this.tracks.find(t => trackName === t.name);
+    hideTrack(trackID) {
+        let track = this.tracks.find(t => trackID === t.id);
         if (track) {
             track.visible = false;
             this.render();
@@ -212,8 +212,8 @@ class CircularView {
         }
     }
 
-    showTrack(trackName) {
-        let idx = this.tracks.findIndex(t => trackName === t.name);
+    showTrack(trackID) {
+        let idx = this.tracks.findIndex(t => trackID === t.id);
         if (idx >= 0) {
             const track = this.tracks[idx];
             track.visible = true;
@@ -225,8 +225,23 @@ class CircularView {
         }
     }
 
-    getTrack(trackName) {
-        return this.tracks.find(t => trackName === t.name);
+    deleteTrack(trackID) {
+        let idx = this.tracks.findIndex(t => trackID === t.id);
+        if(idx >= 0) {
+            this.tracks.splice(idx, 1);
+        }
+    }
+
+    getTrack(trackID) {
+        return this.tracks.find(t => trackID === t.id);
+    }
+
+    setTrackColor(trackID, color) {
+        console.log("Set track color not implemented")
+    }
+
+    setTrackAlpha(trackID, alpha) {
+        console.log("Set track alpha not implemented");
     }
 
 
@@ -291,24 +306,6 @@ class CircularView {
 
         //this.hideTrackSelectButton();
     }
-
-
-    hideTrackSelectButton() {
-        // Hack to hide track menu, which has no relevance to IGV.   The "render" function is async and takes time,
-        // with no way to be notified when its finished (the callback argument is called immediately).
-        setTimeout(() => {
-            let trackButton = this.container.querySelector("button[data-testid='circular_track_select']");
-            if (trackButton) {
-                trackButton.style.display = 'none';
-            } else {
-                if (CircularView.hideTrackSelectedAttempts++ < 5) {
-                    this.hideTrackSelectButton();
-                }
-            }
-        }, 100);
-    }
-
-    static hideTrackSelectedAttempts = 0;
 
 }
 
