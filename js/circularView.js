@@ -1,4 +1,5 @@
 import {getChrColor} from "./chrColor.js";
+import IGVColor from "./igv-color.js";
 
 class CircularView {
 
@@ -108,29 +109,40 @@ class CircularView {
     addChords(newChords, options = {}) {
 
         const name = options.track || options.name || "*";
-        const color = options.color || "black";
 
         let track = this.tracks.find(t => name === t.name);
-        if (track && options.color) {
-            track.color = options.color;  // Override
-        } else if (!track) {
-            track = {name: name, chords: [], color: color, visible: true, id: options.id || guid()}
+
+        // Override track options or create new track
+        if (track) {
+            if (options.color) {
+                track.color = options.color;
+            }
+            if (options.alpha) {
+                track.alpha = options.alpha
+            }
+        } else {
+            track = {
+                name: name,
+                chords: [],
+                color: options.color || "black",
+                alpha: options.alpha || 0.5,
+                visible: true,
+                id: options.id || guid()
+            }
             this.tracks.push(track);
         }
-        const chords = false !== options.append ? track.chords : [];
 
-        const currentIDs = new Set(chords.map(c => c.uniqueId));
+        // Append chords to track
+        const currentIDs = new Set(track.chords.map(c => c.uniqueId));
         for (let c of newChords) {
             if (!currentIDs.has(c.uniqueId) &&
                 this.chrNames.has(shortChrName(c.refName)) &&
                 this.chrNames.has(shortChrName(c.mate.refName))) {
-                chords.push(c);
+                track.chords.push(c);
                 currentIDs.add(c.uniqueId);
             }
         }
         this.render();
-        // this.viewState.config.tracks[0].adapter.features.set(chords);
-        // this.viewState.session.view.showTrack(this.viewState.config.tracks[0].trackId);
     }
 
 
@@ -227,9 +239,10 @@ class CircularView {
 
     deleteTrack(trackID) {
         let idx = this.tracks.findIndex(t => trackID === t.id);
-        if(idx >= 0) {
+        if (idx >= 0) {
             this.tracks.splice(idx, 1);
         }
+        this.render();
     }
 
     getTrack(trackID) {
@@ -237,11 +250,34 @@ class CircularView {
     }
 
     setTrackColor(trackID, color) {
-        console.log("Set track color not implemented")
+        const t = this.getTrack(trackID);
+        if (t) {
+            t.color = color;
+            this.updateTrackColorAlpha(t)
+        }
     }
 
     setTrackAlpha(trackID, alpha) {
-        console.log("Set track alpha not implemented");
+        const t = this.getTrack(trackID);
+        if (t) {
+            t.alpha = alpha;
+            this.updateTrackColorAlpha(t)
+        }
+    }
+
+    updateTrackColorAlpha(t) {
+        const trackID = t.id;
+        let color = t.color || "black";
+        if (t.alpha) {
+            color = IGVColor.addAlpha(color, t.alpha);
+        }
+
+        for (let jbrowseTrack of this.viewState.config.tracks) {
+            if (trackID === jbrowseTrack.trackId) {
+                jbrowseTrack.displays[0].renderer.strokeColor.set(color);
+                break;
+            }
+        }
     }
 
 
@@ -263,6 +299,7 @@ class CircularView {
 
         const jbrowseTracks = [];
         const colors = [];
+
         for (let trackConfig of visibleTracks) {
             jbrowseTracks.push({
                 trackId: trackConfig.id,
@@ -275,6 +312,7 @@ class CircularView {
                 }
             })
             colors.push(trackConfig.color);
+
         }
 
         this.viewState = createViewState({
@@ -303,10 +341,7 @@ class CircularView {
                 );
             }
         }
-
-        //this.hideTrackSelectButton();
     }
-
 }
 
 function shortChrName(chrName) {
