@@ -10,18 +10,32 @@ class CircularView {
     /**
      * Create a new CircularView
      *
-     * @param div
+     * @param container
      * @param config - configuration options
      *   {
      *       assembly: {name: string, id: string, chromosomes: [{name: string, bpLength: integer, color: string}]
      *       onChordClick: function called upon chord click with chord feature as argument
      *   }
      */
-    constructor(div, config) {
+    constructor(container, config) {
         config = config || {}
         if (CircularView.isInstalled()) {
 
-            this.container = div;
+            let element
+
+            // toolbar
+            element = document.createElement('div')
+            element.className = 'jbrowse-toolbar'
+            container.appendChild(element)
+            this.toolbar = element
+
+            // circular view container
+            element = document.createElement('div')
+            element.className = 'jbrowse-circular-genome-view'
+            container.appendChild(element)
+            this.container = element;
+
+
             this.config = config;
 
             if (config.assembly) {
