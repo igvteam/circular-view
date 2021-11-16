@@ -1,7 +1,10 @@
 # Optional npm cache directory
 .npm
 
+.DS_STORE
 /circular-view.iml
 /app/build/
 /app/node_modules/
 /app/package-lock.json
+/test/css/.sass-cache
+/.idea/
