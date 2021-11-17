@@ -204,14 +204,11 @@ class CircularView {
     }
 
     get visible() {
-        return this.container.style.display === 'block';
+        return this.container.style.display !== 'none';
     }
 
     set visible(isVisible) {
         this.container.style.display = isVisible ? 'block' : 'none';
-        if (isVisible) {
-            this.render();
-        }
     }
 
     hideTrack(trackID) {
