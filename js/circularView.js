@@ -165,8 +165,8 @@ class CircularView {
                     this.setTrackColor(track.id, rgbString);
                 },
             }
-        const picker = new Picker(pickerConfig)
 
+        new Picker(pickerConfig)
 
         // set track opacity
         const label = document.createElement('label')
@@ -177,9 +177,7 @@ class CircularView {
         label.appendChild(element)
         element.type = 'text'
         element.value = track.alpha.toString()
-        element.addEventListener('change', event => {
-            alert(`Set Track Opacity ${ event.target.value }`)
-        })
+        element.addEventListener('change', event => this.setTrackAlpha(track.id, parseFloat(event.target.value)))
 
         // delete track
         element = document.createElement('button')
