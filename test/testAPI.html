@@ -29,11 +29,11 @@
     Sniffles:
     <button id="sifflesLoad">Load</button>
 <!--    <button id="snifflesToggle">Hide</button>-->
-    <button id="snifflesColor">Color</button>
+<!--    <button id="snifflesColor">Color</button>-->
 <!--    <button id="snifflesDelete">Delete</button>-->
-    <label for="snifflesAlpha">Alpha
-        <input id="snifflesAlpha" type="text" value="0.5">
-    </label>
+<!--    <label for="snifflesAlpha">Alpha-->
+<!--        <input id="snifflesAlpha" type="text" value="0.5">-->
+<!--    </label>-->
 
 
 </p>
@@ -41,11 +41,11 @@
     Delly:
     <button id="dellyLoad">Load</button>
 <!--    <button id="dellyToggle">Hide</button>-->
-    <button id="dellyColor">Color</button>
+<!--    <button id="dellyColor">Color</button>-->
 <!--    <button id="dellyDelete">Delete</button>-->
-    <label for="dellyAlpha">Alpha
-        <input id="dellyAlpha" type="text" value="0.5">
-    </label>
+<!--    <label for="dellyAlpha">Alpha-->
+<!--        <input id="dellyAlpha" type="text" value="0.5">-->
+<!--    </label>-->
 
 
 </p>
@@ -83,14 +83,14 @@
 
     document.getElementById("sifflesLoad").addEventListener("click", e => loadTrack(snifflesData));
     // document.getElementById("snifflesToggle").addEventListener("click", e => toggleTrack(e, snifflesData.track.id));
-    document.getElementById("snifflesColor").addEventListener("click", e => colorTrack(snifflesData.track.id));
-    document.getElementById("snifflesAlpha").addEventListener('change', e => alphaTrack(snifflesData.track.id, e.target.value));
+    // document.getElementById("snifflesColor").addEventListener("click", e => colorTrack(snifflesData.track.id));
+    // document.getElementById("snifflesAlpha").addEventListener('change', e => alphaTrack(snifflesData.track.id, e.target.value));
     // document.getElementById("snifflesDelete").addEventListener("click", e => circularView.deleteTrack(snifflesData.track.id));
 
     document.getElementById("dellyLoad").addEventListener("click", e => loadTrack(dellyData));
     // document.getElementById("dellyToggle").addEventListener("click", e => toggleTrack(e, dellyData.track.id));
-    document.getElementById("dellyColor").addEventListener("click", e => colorTrack(dellyData.track.id));
-    document.getElementById("dellyAlpha").addEventListener('change', e => alphaTrack(dellyData.track.id, e.target.value));
+    // document.getElementById("dellyColor").addEventListener("click", e => colorTrack(dellyData.track.id));
+    // document.getElementById("dellyAlpha").addEventListener('change', e => alphaTrack(dellyData.track.id, e.target.value));
     // document.getElementById("dellyDelete").addEventListener("click", e => circularView.deleteTrack(dellyData.track.id));
 
 
