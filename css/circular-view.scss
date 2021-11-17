@@ -8,8 +8,9 @@ $jbrowse-circular-genome-view-size: 640px;
 
   box-sizing: content-box;
 
-  border-color: magenta;
+  border-color: dimgray;
   border-style: solid;
+  border-width: thin;
 
   display: flex;
   flex-direction: column;
@@ -26,10 +27,11 @@ $jbrowse-circular-genome-view-size: 640px;
   width: 100%;
   height: $jbrowse-toolbar-height;
 
-  background-color: greenyellow;
+  background-color: lightgrey;
 
   border-bottom-style: solid;
   border-bottom-color: dimgray;
+  border-bottom-width: thin;
 
   display: flex;
   flex-flow: row;
@@ -44,7 +46,7 @@ $jbrowse-circular-genome-view-size: 640px;
   height: 100%;
   width: fit-content;
 
-  background-color: darkseagreen;
+  //background-color: darkseagreen;
 
   display: flex;
   flex-flow: row;
@@ -60,15 +62,24 @@ $jbrowse-circular-genome-view-size: 640px;
 }
 
 .jbrowse-circular-genome-view {
-  background-color: grey;
+  //background-color: grey;
   width: $jbrowse-circular-genome-view-size;
   height: $jbrowse-circular-genome-view-size;
 }
 
 .jbrowse-track-panel {
 
+  z-index: 1024;
+  position: absolute;
+  top: $jbrowse-toolbar-height;
+  left:0;
+
   width: 100%;
   height: fit-content;
+
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
+  border-bottom-width: thin;
 
   color: dimgray;
   font-family: $jbrowse-font-face;
@@ -86,7 +97,7 @@ $jbrowse-circular-genome-view-size: 640px;
     width: 100%;
     height: 28px;
 
-    background-color: lightcyan;
+    background-color: white;
 
     display: flex;
     flex-flow: row;
@@ -122,7 +133,7 @@ $jbrowse-circular-genome-view-size: 640px;
   }
 
   >div:nth-child(odd) {
-    background-color: lightblue;
+    background-color: rgb(245, 245, 245);
   }
 
 }

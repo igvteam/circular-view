@@ -1,8 +1,9 @@
 .jbrowse-container {
   position: relative;
   box-sizing: content-box;
-  border-color: magenta;
+  border-color: dimgray;
   border-style: solid;
+  border-width: thin;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -14,9 +15,10 @@
 .jbrowse-toolbar {
   width: 100%;
   height: 32px;
-  background-color: greenyellow;
+  background-color: lightgrey;
   border-bottom-style: solid;
   border-bottom-color: dimgray;
+  border-bottom-width: thin;
   display: flex;
   flex-flow: row;
   flex-wrap: nowrap;
@@ -26,7 +28,6 @@
 .jbrowse-toolbar-button-container {
   height: 100%;
   width: fit-content;
-  background-color: darkseagreen;
   display: flex;
   flex-flow: row;
   flex-wrap: nowrap;
@@ -37,13 +38,19 @@
     margin-right: 4px; }
 
 .jbrowse-circular-genome-view {
-  background-color: grey;
   width: 640px;
   height: 640px; }
 
 .jbrowse-track-panel {
+  z-index: 1024;
+  position: absolute;
+  top: 32px;
+  left: 0;
   width: 100%;
   height: fit-content;
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
+  border-bottom-width: thin;
   color: dimgray;
   font-family: "Open Sans", sans-serif;
   font-size: 12px;
@@ -56,7 +63,7 @@
   .jbrowse-track-panel > div {
     width: 100%;
     height: 28px;
-    background-color: lightcyan;
+    background-color: white;
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
@@ -76,6 +83,6 @@
     .jbrowse-track-panel > div > button:last-child {
       margin-right: 4px; }
   .jbrowse-track-panel > div:nth-child(odd) {
-    background-color: lightblue; }
+    background-color: whitesmoke; }
 
 /*# sourceMappingURL=circular-view.css.map */
