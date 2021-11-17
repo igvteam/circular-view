@@ -1,0 +1,1 @@
+This directory contains documentation and an example from the JBrowse team. 
