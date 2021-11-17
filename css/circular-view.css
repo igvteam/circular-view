@@ -1,4 +1,5 @@
 .jbrowse-container {
+  position: relative;
   box-sizing: content-box;
   border-color: magenta;
   border-style: solid;
@@ -14,6 +15,8 @@
   width: 100%;
   height: 36px;
   background-color: greenyellow;
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
   display: flex;
   flex-flow: row;
   flex-wrap: nowrap;
@@ -25,9 +28,9 @@
   width: fit-content;
   background-color: deepskyblue;
   display: flex;
-  flex-flow: column;
+  flex-flow: row;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center; }
   .jbrowse-toolbar-button-container button {
     margin-left: 4px;
@@ -38,21 +41,28 @@
   width: 800px;
   height: 800px; }
 
-.jbrowse-toolbar-button-container {
-  height: 100%;
+.jbrowse-track-panel {
+  width: 100%;
+  height: 128px;
+  background-color: lightgoldenrodyellow;
   display: flex;
-  flex-flow: row;
+  flex-flow: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  align-items: center;
-  color: dimgray; }
-  .jbrowse-toolbar-button-container i {
-    display: block;
-    margin-top: 4px;
-    margin-left: 8px;
-    cursor: pointer; }
+  align-items: center; }
+  .jbrowse-track-panel > div {
+    width: 100%;
+    height: 36px;
+    background-color: orangered;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center; }
+    .jbrowse-track-panel > div > div {
+      margin-left: 4px;
+      background-color: darkturquoise;
+      height: 100%;
+      width: fit-content; }
 
-button[data-testid='circular-track-select'] {
-  display: none; }
-
-/*# sourceMappingURL=style.css.map */
+/*# sourceMappingURL=circular-view.css.map */

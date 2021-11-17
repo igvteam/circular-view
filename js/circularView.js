@@ -23,21 +23,17 @@ class CircularView {
 
             this.parent = parent
 
-            let element
-
             // toolbar
-            element = document.createElement('div')
-            element.className = 'jbrowse-toolbar'
-            parent.appendChild(element)
-            this.toolbar = element
+            this.createToolbarAndTrackPanel(parent)
 
-            this.configureToolbar(this.toolbar)
+            let element
 
             // circular view container
             element = document.createElement('div')
             element.className = 'jbrowse-circular-genome-view'
             parent.appendChild(element)
-            this.container = element;
+            this.container = element
+
 
             this.config = config;
 
@@ -45,30 +41,54 @@ class CircularView {
                 this.setAssembly(config.assembly)
             }
 
-            this.tracks = [];
+            this.tracks = []
 
         } else {
-            console.error("JBrowse circular view is not installed");
+            console.error("JBrowse circular view is not installed")
         }
     }
 
-    configureToolbar(toolbar) {
+    createToolbarAndTrackPanel(parent) {
 
-        let button
+        let element
+
+        // toolbar
+        element = document.createElement('div')
+        element.className = 'jbrowse-toolbar'
+        parent.appendChild(element)
+        this.toolbar = element
+
+
+        // track panel
+        element = document.createElement('div')
+        element.className = 'jbrowse-track-panel'
+        parent.appendChild(element)
+        this.trackPanel = element
+
+        this.trackPanel.style.display = 'none'
+
+
         let buttonContainer
 
         // toolbar button container - Track Options - Clear All
         buttonContainer = document.createElement('div')
         buttonContainer.className = 'jbrowse-toolbar-button-container'
-        toolbar.appendChild(buttonContainer)
+        this.toolbar.appendChild(buttonContainer)
 
+        let button
 
         // Track Options
         button = document.createElement('button')
         buttonContainer.appendChild(button)
-        button.innerText = 'Track Options'
-        button.addEventListener('click', () => {
-            alert('Track Options')
+        button.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options'
+        button.addEventListener('click', (event) => {
+            if ('none' === this.trackPanel.style.display) {
+                this.trackPanel.style.display = 'flex'
+                event.target.innerText = 'Hide Track Options'
+            } else {
+                this.trackPanel.style.display = 'none'
+                event.target.innerText = 'Show Track Options'
+            }
         })
 
         // Clear All Chords
@@ -83,7 +103,7 @@ class CircularView {
         // toolbar button container - Close Window
         buttonContainer = document.createElement('div')
         buttonContainer.className = 'jbrowse-toolbar-button-container'
-        toolbar.appendChild(buttonContainer)
+        this.toolbar.appendChild(buttonContainer)
 
         // Close Window
         button = document.createElement('button')

@@ -1,4 +1,8 @@
+$jbrowse-toobar-height: 36px;
+
 .jbrowse-container {
+
+  position: relative;
 
   box-sizing: content-box;
 
@@ -18,9 +22,12 @@
 .jbrowse-toolbar {
 
   width: 100%;
-  height: 36px;
+  height: $jbrowse-toobar-height;
 
   background-color: greenyellow;
+
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
 
   display: flex;
   flex-flow: row;
@@ -38,9 +45,9 @@
   background-color: deepskyblue;
 
   display: flex;
-  flex-flow: column;
+  flex-flow: row;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 
   button {
@@ -56,29 +63,38 @@
   height: 800px;
 }
 
-.jbrowse-toolbar-button-container {
+.jbrowse-track-panel {
 
-  height: 100%;
+  width: 100%;
+  //height: fit-content;
+  height: 128px;
+
+  background-color: lightgoldenrodyellow;
 
   display: flex;
-  flex-flow: row;
+  flex-flow: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
 
-  color: dimgray;
+  >div {
+    width: 100%;
+    height: 36px;
+    background-color: orangered;
 
-  i {
-    display: block;
-    margin-top: 4px;
-    margin-left: 8px;
-    cursor: pointer;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+
+    >div {
+      margin-left: 4px;
+      background-color: darkturquoise;
+      height: 100%;
+      width: fit-content;
+    }
+
   }
 
 }
-
-button[data-testid='circular-track-select'] {
-  display: none;
-}
-
-
