@@ -3,26 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Circular Genome View</title>
-    <!-- The commented scripts below are the minified production versions of the
-      other scripts -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="anonymous"></script>
-    <!--    <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.development.js"
-                crossorigin="anonymous"></script>-->
-    <script
-            src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"
-            crossorigin="anonymous"
-    ></script>
 
-    <!--    <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"
-                crossorigin></script>-->
-    <style>
-        button[data-testid='circular_track_select'] {
-            display: none;
-        }
-    </style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"></script>
 </head>
 <body>
 
@@ -51,9 +38,7 @@
 
 </p>
 
-<div id="jbrowse_circular_genome_view"
-     style="width: 800px; height: 800px; border: black; border-style: solid; background: white"></div>
-
+<div class='jbrowse-container'></div>
 
 <script type="module">
 
@@ -64,7 +49,6 @@
     import snifflesData from "./snifflesTrackData.js";
     import dellyData from "./dellyTrackData.js";
 
-    const el = document.getElementById('jbrowse_circular_genome_view');
     const config = {
         assembly: hg19,
         onChordClick: (feature) => {
@@ -80,7 +64,7 @@
         }
     }
 
-    const circularView = new CircularView(el, config);
+    const circularView = new CircularView(document.querySelector('.jbrowse-container'), config);
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
