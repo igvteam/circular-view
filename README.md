@@ -1,7 +1,7 @@
 # circular-view
 
-A wrapper class for jBrowse genomic circular view component for use by IGV projects.  This class is tailored for
-IGV use cases, for general see the jBrowse project:
+A wrapper class for JBrowse genomic circular view component for use by IGV projects.  This class is tailored for
+IGV use cases, for general see the JBrowse project:
 
 * [https://github.com/GMOD/jbrowse-components/tree/main/products/jbrowse-react-circular-genome-view](https://github.com/GMOD/jbrowse-components/tree/main/products/jbrowse-react-circular-genome-view)
 
@@ -18,6 +18,7 @@ IGV use cases, for general see the jBrowse project:
        id: string,
        name: string, 
        color: string, 
+       alpha: number,
        visible: boolean
     }
  ]
