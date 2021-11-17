@@ -10,8 +10,6 @@ let circularView
 
 function main () {
 
-    // configureToolbar()
-
     const config =
         {
             onChordClick: feature => {
@@ -34,21 +32,6 @@ function main () {
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
     document.getElementById("sniffles").addEventListener("click", e => toggleTrack(e, snifflesTrack));
     document.getElementById("delly").addEventListener("click", e => toggleTrack(e, dellyTrack));
-
-}
-
-function configureToolbar() {
-    document.getElementById('jbrowse-track-options').addEventListener('click', () => {
-        alert('Present Track Options')
-    })
-
-    document.getElementById('jbrowse-clear-all-chords').addEventListener('click', () => {
-        alert('Clear All Chords')
-    })
-
-    document.getElementById('jbrowse-close-window').addEventListener('click', () => {
-        alert('Close Window')
-    })
 
 }
 

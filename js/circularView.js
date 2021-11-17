@@ -10,31 +10,34 @@ class CircularView {
     /**
      * Create a new CircularView
      *
-     * @param container
+     * @param parent
      * @param config - configuration options
      *   {
      *       assembly: {name: string, id: string, chromosomes: [{name: string, bpLength: integer, color: string}]
      *       onChordClick: function called upon chord click with chord feature as argument
      *   }
      */
-    constructor(container, config) {
+    constructor(parent, config) {
         config = config || {}
         if (CircularView.isInstalled()) {
+
+            this.parent = parent
 
             let element
 
             // toolbar
             element = document.createElement('div')
             element.className = 'jbrowse-toolbar'
-            container.appendChild(element)
+            parent.appendChild(element)
             this.toolbar = element
+
+            this.configureToolbar(this.toolbar)
 
             // circular view container
             element = document.createElement('div')
             element.className = 'jbrowse-circular-genome-view'
-            container.appendChild(element)
+            parent.appendChild(element)
             this.container = element;
-
 
             this.config = config;
 
@@ -47,6 +50,49 @@ class CircularView {
         } else {
             console.error("JBrowse circular view is not installed");
         }
+    }
+
+    configureToolbar(toolbar) {
+
+        let button
+        let buttonContainer
+
+        // toolbar button container - Track Options - Clear All
+        buttonContainer = document.createElement('div')
+        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        toolbar.appendChild(buttonContainer)
+
+
+        // Track Options
+        button = document.createElement('button')
+        buttonContainer.appendChild(button)
+        button.innerText = 'Track Options'
+        button.addEventListener('click', () => {
+            alert('Track Options')
+        })
+
+        // Clear All Chords
+        button = document.createElement('button')
+        buttonContainer.appendChild(button)
+        button.innerText = 'Clear All'
+        button.addEventListener('click', () => {
+            this.clearChords()
+        })
+
+
+        // toolbar button container - Close Window
+        buttonContainer = document.createElement('div')
+        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        toolbar.appendChild(buttonContainer)
+
+        // Close Window
+        button = document.createElement('button')
+        buttonContainer.appendChild(button)
+        button.innerText = 'Close Window'
+        button.addEventListener('click', () => {
+            this.visible = false
+        })
+
     }
 
     /**
@@ -159,7 +205,6 @@ class CircularView {
         this.render();
     }
 
-
     /**
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
@@ -173,11 +218,9 @@ class CircularView {
         }
     }
 
-
     getSize() {
         return this.container.clientWidth;
     }
-
 
     clearChords() {
         this.tracks = [];
@@ -207,22 +250,22 @@ class CircularView {
      * Deprecated, use "visible" property
      */
     show() {
-        this.container.style.display = 'block';
+        this.parent.style.display = 'block';
     }
 
     /**
      * Deprecated, use "visible" property
      */
     hide() {
-        this.container.style.display = 'none';
+        this.parent.style.display = 'none';
     }
 
     get visible() {
-        return this.container.style.display !== 'none';
+        return this.parent.style.display !== 'none';
     }
 
     set visible(isVisible) {
-        this.container.style.display = isVisible ? 'block' : 'none';
+        this.parent.style.display = isVisible ? 'block' : 'none';
     }
 
     hideTrack(trackID) {
@@ -290,7 +333,6 @@ class CircularView {
             }
         }
     }
-
 
     /**
      * The main render function.  Render here means build the React DOM.  Trying to change react state dynamically
@@ -363,10 +405,8 @@ function defaultOnChordClick(feature, chordTrack, pluginManager) {
     console.log(feature);
 }
 
-
 function guid() {
     return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
 }
-
 
 export default CircularView;
