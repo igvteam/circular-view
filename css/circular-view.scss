@@ -1,4 +1,6 @@
-$jbrowse-toobar-height: 36px;
+$jbrowse-font-face: 'Open Sans', sans-serif;
+$jbrowse-toolbar-height: 32px;
+$jbrowse-circular-genome-view-size: 640px;
 
 .jbrowse-container {
 
@@ -22,7 +24,7 @@ $jbrowse-toobar-height: 36px;
 .jbrowse-toolbar {
 
   width: 100%;
-  height: $jbrowse-toobar-height;
+  height: $jbrowse-toolbar-height;
 
   background-color: greenyellow;
 
@@ -42,7 +44,7 @@ $jbrowse-toobar-height: 36px;
   height: 100%;
   width: fit-content;
 
-  background-color: deepskyblue;
+  background-color: darkseagreen;
 
   display: flex;
   flex-flow: row;
@@ -59,17 +61,19 @@ $jbrowse-toobar-height: 36px;
 
 .jbrowse-circular-genome-view {
   background-color: grey;
-  width: 800px;
-  height: 800px;
+  width: $jbrowse-circular-genome-view-size;
+  height: $jbrowse-circular-genome-view-size;
 }
 
 .jbrowse-track-panel {
 
   width: 100%;
-  //height: fit-content;
-  height: 128px;
+  height: fit-content;
 
-  background-color: lightgoldenrodyellow;
+  color: dimgray;
+  font-family: $jbrowse-font-face;
+  font-size: 12px;
+  font-weight: 700;
 
   display: flex;
   flex-flow: column;
@@ -77,10 +81,12 @@ $jbrowse-toobar-height: 36px;
   justify-content: flex-start;
   align-items: center;
 
+  // track tools
   >div {
     width: 100%;
-    height: 36px;
-    background-color: orangered;
+    height: 28px;
+
+    background-color: lightcyan;
 
     display: flex;
     flex-flow: row;
@@ -89,12 +95,34 @@ $jbrowse-toobar-height: 36px;
     align-items: center;
 
     >div {
+
       margin-left: 4px;
-      background-color: darkturquoise;
-      height: 100%;
-      width: fit-content;
+      vertical-align: middle;
+
+      padding-left: 4px;
+      padding-right: 4px;
+
+      height: fit-content;
+      width: 96px;
     }
 
+    >label {
+
+      >input {
+        margin-left: 4px;
+        text-align: center;
+        width: 32px;
+      }
+
+    }
+
+    >button:last-child {
+      margin-right: 4px;
+    }
+  }
+
+  >div:nth-child(odd) {
+    background-color: lightblue;
   }
 
 }

@@ -13,7 +13,7 @@
 
 .jbrowse-toolbar {
   width: 100%;
-  height: 36px;
+  height: 32px;
   background-color: greenyellow;
   border-bottom-style: solid;
   border-bottom-color: dimgray;
@@ -26,7 +26,7 @@
 .jbrowse-toolbar-button-container {
   height: 100%;
   width: fit-content;
-  background-color: deepskyblue;
+  background-color: darkseagreen;
   display: flex;
   flex-flow: row;
   flex-wrap: nowrap;
@@ -38,13 +38,16 @@
 
 .jbrowse-circular-genome-view {
   background-color: grey;
-  width: 800px;
-  height: 800px; }
+  width: 640px;
+  height: 640px; }
 
 .jbrowse-track-panel {
   width: 100%;
-  height: 128px;
-  background-color: lightgoldenrodyellow;
+  height: fit-content;
+  color: dimgray;
+  font-family: "Open Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
   display: flex;
   flex-flow: column;
   flex-wrap: nowrap;
@@ -52,8 +55,8 @@
   align-items: center; }
   .jbrowse-track-panel > div {
     width: 100%;
-    height: 36px;
-    background-color: orangered;
+    height: 28px;
+    background-color: lightcyan;
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
@@ -61,8 +64,18 @@
     align-items: center; }
     .jbrowse-track-panel > div > div {
       margin-left: 4px;
-      background-color: darkturquoise;
-      height: 100%;
-      width: fit-content; }
+      vertical-align: middle;
+      padding-left: 4px;
+      padding-right: 4px;
+      height: fit-content;
+      width: 96px; }
+    .jbrowse-track-panel > div > label > input {
+      margin-left: 4px;
+      text-align: center;
+      width: 32px; }
+    .jbrowse-track-panel > div > button:last-child {
+      margin-right: 4px; }
+  .jbrowse-track-panel > div:nth-child(odd) {
+    background-color: lightblue; }
 
 /*# sourceMappingURL=circular-view.css.map */

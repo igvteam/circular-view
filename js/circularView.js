@@ -78,17 +78,25 @@ class CircularView {
         let button
 
         // Track Options
-        button = document.createElement('button')
-        buttonContainer.appendChild(button)
-        button.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options'
-        button.addEventListener('click', (event) => {
-            if ('none' === this.trackPanel.style.display) {
-                this.trackPanel.style.display = 'flex'
-                event.target.innerText = 'Hide Track Options'
-            } else {
-                this.trackPanel.style.display = 'none'
-                event.target.innerText = 'Show Track Options'
+        this.trackPanelPresentationButton = document.createElement('button')
+        buttonContainer.appendChild(this.trackPanelPresentationButton)
+        this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options'
+        this.trackPanelPresentationButton.addEventListener('click', (event) => {
+
+            const trackPanelRows = this.trackPanel.querySelectorAll('div')
+
+            if (trackPanelRows.length > 0) {
+
+                if ('none' === this.trackPanel.style.display) {
+                    this.trackPanel.style.display = 'flex'
+                    event.target.innerText = 'Hide Track Options'
+                } else {
+                    this.trackPanel.style.display = 'none'
+                    event.target.innerText = 'Show Track Options'
+                }
+
             }
+
         })
 
         // Clear All Chords
@@ -112,6 +120,73 @@ class CircularView {
         button.addEventListener('click', () => {
             this.visible = false
         })
+
+    }
+
+    addToTrackPanel(track) {
+
+        const trackPanelRow = document.createElement('div')
+        this.trackPanel.appendChild(trackPanelRow)
+
+        let element
+
+        // track name
+        element = document.createElement('div')
+        element.innerText = track.name
+        trackPanelRow.appendChild(element)
+
+        // track hide|show
+        element = document.createElement('button')
+        element.innerText = true === track.visible ? 'Hide' : 'Show'
+        element.addEventListener('click', event => {
+
+            if (true === track.visible) {
+                this.hideTrack(track.id)
+                event.target.innerText = "Show"
+            } else {
+                this.showTrack(track.id)
+                event.target.innerText = "Hide"
+            }
+
+        })
+        trackPanelRow.appendChild(element)
+
+        // track color
+        element = document.createElement('button')
+        element.innerText = 'Color'
+        element.addEventListener('click', event => {
+            alert('Change Track Color')
+        })
+        trackPanelRow.appendChild(element)
+
+
+        // set track opacity
+        const label = document.createElement('label')
+        label.innerText = 'Alpha'
+        trackPanelRow.appendChild(label)
+
+        element = document.createElement('input')
+        element.type = 'text'
+        element.value = track.alpha.toString()
+        element.addEventListener('change', event => {
+            alert(`Set Track Opacity ${ event.target.value }`)
+        })
+        label.appendChild(element)
+
+
+        // delete track
+        element = document.createElement('button')
+        element.innerText = 'Delete'
+        element.addEventListener('click', event => {
+            this.deleteTrack(track.id)
+            trackPanelRow.remove()
+
+            if (0 === this.trackPanel.querySelectorAll('div').length) {
+                this.trackPanelPresentationButton.innerText = 'Show Track Options'
+                this.trackPanel.style.display = 'none'
+            }
+        })
+        trackPanelRow.appendChild(element)
 
     }
 
@@ -201,15 +276,18 @@ class CircularView {
                 track.alpha = options.alpha
             }
         } else {
-            track = {
-                name: name,
+            track =
+                {
+                name,
                 chords: [],
                 color: options.color || "black",
                 alpha: options.alpha || 0.5,
                 visible: true,
                 id: options.id || guid()
             }
-            this.tracks.push(track);
+            this.tracks.push(track)
+
+            this.addToTrackPanel(track)
         }
 
         // Append chords to track
