@@ -74,6 +74,9 @@
       vertical-align: middle;
       padding-left: 4px;
       padding-right: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       height: fit-content;
       width: 96px; }
     .jbrowse-track-panel > div > label > input {

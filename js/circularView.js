@@ -133,7 +133,7 @@ class CircularView {
         // track name
         element = document.createElement('div')
         trackPanelRow.appendChild(element)
-        element.innerText = track.name
+        element.innerText = element.title = track.name
 
         // track hide|show
         element = document.createElement('button')
