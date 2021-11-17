@@ -132,11 +132,12 @@ class CircularView {
 
         // track name
         element = document.createElement('div')
-        element.innerText = track.name
         trackPanelRow.appendChild(element)
+        element.innerText = track.name
 
         // track hide|show
         element = document.createElement('button')
+        trackPanelRow.appendChild(element)
         element.innerText = true === track.visible ? 'Hide' : 'Show'
         element.addEventListener('click', event => {
 
@@ -149,33 +150,40 @@ class CircularView {
             }
 
         })
-        trackPanelRow.appendChild(element)
 
         // track color
-        element = document.createElement('button')
-        element.innerText = 'Color'
-        element.addEventListener('click', event => {
-            alert('Change Track Color')
-        })
-        trackPanelRow.appendChild(element)
+        const pickerButton = document.createElement('button')
+        pickerButton.innerText = 'Color'
+        trackPanelRow.appendChild(pickerButton)
+
+        const pickerConfig =
+            {
+                parent: pickerButton,
+                alpha: false,
+                editorFormat: 'rgb',
+                onChange: ({ rgbString }) => {
+                    this.setTrackColor(track.id, rgbString);
+                },
+            }
+        const picker = new Picker(pickerConfig)
 
 
         // set track opacity
         const label = document.createElement('label')
-        label.innerText = 'Alpha'
         trackPanelRow.appendChild(label)
+        label.innerText = 'Alpha'
 
         element = document.createElement('input')
+        label.appendChild(element)
         element.type = 'text'
         element.value = track.alpha.toString()
         element.addEventListener('change', event => {
             alert(`Set Track Opacity ${ event.target.value }`)
         })
-        label.appendChild(element)
-
 
         // delete track
         element = document.createElement('button')
+        trackPanelRow.appendChild(element)
         element.innerText = 'Delete'
         element.addEventListener('click', event => {
             this.deleteTrack(track.id)
@@ -186,7 +194,6 @@ class CircularView {
                 this.trackPanel.style.display = 'none'
             }
         })
-        trackPanelRow.appendChild(element)
 
     }
 

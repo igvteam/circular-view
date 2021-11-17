@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <title>Circular Genome View</title>
 
+    <!-- Vanilla Picker CSS -->
+    <link rel="stylesheet" href="../css/vanilla-picker.csp.css">
+
     <!-- CSS -->
     <link rel="stylesheet" href="../css/circular-view.css">
 
     <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"></script>
+
+    <!-- Vanilla Picker JS -->
+    <script src="../js/vanilla-picker.csp.js"></script>
+
+
 </head>
 <body>
 
@@ -74,16 +82,16 @@
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
 
     document.getElementById("sifflesLoad").addEventListener("click", e => loadTrack(snifflesData));
-    document.getElementById("snifflesToggle").addEventListener("click", e => toggleTrack(e, snifflesData.track.id));
+    // document.getElementById("snifflesToggle").addEventListener("click", e => toggleTrack(e, snifflesData.track.id));
     document.getElementById("snifflesColor").addEventListener("click", e => colorTrack(snifflesData.track.id));
     document.getElementById("snifflesAlpha").addEventListener('change', e => alphaTrack(snifflesData.track.id, e.target.value));
-    document.getElementById("snifflesDelete").addEventListener("click", e => circularView.deleteTrack(snifflesData.track.id));
+    // document.getElementById("snifflesDelete").addEventListener("click", e => circularView.deleteTrack(snifflesData.track.id));
 
     document.getElementById("dellyLoad").addEventListener("click", e => loadTrack(dellyData));
-    document.getElementById("dellyToggle").addEventListener("click", e => toggleTrack(e, dellyData.track.id));
+    // document.getElementById("dellyToggle").addEventListener("click", e => toggleTrack(e, dellyData.track.id));
     document.getElementById("dellyColor").addEventListener("click", e => colorTrack(dellyData.track.id));
     document.getElementById("dellyAlpha").addEventListener('change', e => alphaTrack(dellyData.track.id, e.target.value));
-    document.getElementById("dellyDelete").addEventListener("click", e => circularView.deleteTrack(dellyData.track.id));
+    // document.getElementById("dellyDelete").addEventListener("click", e => circularView.deleteTrack(dellyData.track.id));
 
 
     function loadTrack(data) {
