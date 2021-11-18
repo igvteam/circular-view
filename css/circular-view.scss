@@ -4,7 +4,7 @@ $jbrowse-circular-genome-view-size: 640px;
 
 .jbrowse-container {
 
-  position: relative;
+  position: absolute;
 
   box-sizing: content-box;
 
@@ -24,6 +24,7 @@ $jbrowse-circular-genome-view-size: 640px;
 
 .jbrowse-toolbar {
 
+  position: relative;
   width: 100%;
   height: $jbrowse-toolbar-height;
 
@@ -39,6 +40,12 @@ $jbrowse-circular-genome-view-size: 640px;
   justify-content: space-between;
   align-items: center;
 
+}
+
+.jbrowse-circular-genome-view {
+  //background-color: grey;
+  //width: $jbrowse-circular-genome-view-size;
+  //height: $jbrowse-circular-genome-view-size;
 }
 
 .jbrowse-toolbar-button-container {
@@ -59,12 +66,6 @@ $jbrowse-circular-genome-view-size: 640px;
     margin-right: 4px;
   }
 
-}
-
-.jbrowse-circular-genome-view {
-  //background-color: grey;
-  width: $jbrowse-circular-genome-view-size;
-  height: $jbrowse-circular-genome-view-size;
 }
 
 .jbrowse-track-panel {

@@ -24,6 +24,10 @@
 <p>
     <button id="hg19">Genome hg19</button>
     <button id="mm10">Genome mm10</button>
+    <label for="size-input">
+        <input id="size-input" type="text" name="circular-view-size">
+        Set Size
+    </label>
 </p>
 <p>
     Sniffles:
@@ -80,6 +84,19 @@
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
+
+    document.getElementById('size-input').addEventListener('keyup', event => {
+        event.preventDefault()
+        event.stopPropagation()
+        if (13 === event.keyCode) {
+            circularView.container.style.width = `${ event.target.value }px`
+            circularView.container.style.height = `${ event.target.value }px`
+            circularView.setSize(Number.parseInt(event.target.value))
+        }
+    })
+
+
+
 
     document.getElementById("sifflesLoad").addEventListener("click", e => loadTrack(snifflesData));
     // document.getElementById("snifflesToggle").addEventListener("click", e => toggleTrack(e, snifflesData.track.id));

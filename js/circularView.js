@@ -177,7 +177,11 @@ class CircularView {
         label.appendChild(element)
         element.type = 'text'
         element.value = track.alpha.toString()
-        element.addEventListener('change', event => this.setTrackAlpha(track.id, parseFloat(event.target.value)))
+        element.addEventListener('change', event => {
+            event.stopPropagation()
+            event.preventDefault()
+            this.setTrackAlpha(track.id, parseFloat(event.target.value))
+        })
 
         // delete track
         element = document.createElement('button')
