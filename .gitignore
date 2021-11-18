@@ -2,9 +2,7 @@
 .npm
 .DS_STORE
 /circular-view.iml
-/app/build/
-/app/node_modules/
-/app/package-lock.json
+/package-lock.json
 /css/.sass-cache
 /.idea/
 /node_modules/
