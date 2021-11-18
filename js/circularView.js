@@ -133,7 +133,7 @@ class CircularView {
         // track name
         element = document.createElement('div')
         trackPanelRow.appendChild(element)
-        element.innerText = element.title = track.name
+        element.innerText = element.title = `${track.name}-${track.name}-${track.name}`
 
         // track hide|show
         element = document.createElement('button')
@@ -151,19 +151,17 @@ class CircularView {
 
         })
 
-        // track color
+        // track color & alpha
         const pickerButton = document.createElement('button')
-        pickerButton.innerText = 'Color'
+        pickerButton.innerText = 'Color & Alpha'
         trackPanelRow.appendChild(pickerButton)
 
         const pickerConfig =
             {
                 parent: pickerButton,
-                // alpha: false,
-                // editorFormat: 'rgb',
-                // onChange: ({ rgbString }) => {
-                //     this.setTrackColor(track.id, rgbString);
-                // },
+                popup: 'left',
+                editorFormat: 'rgb',
+                color:track.color,
                 onChange: ({ rgba, rgbString }) => {
                     this.setTrackAlpha(track.id, parseFloat(rgba[ 3 ]))
                     this.setTrackColor(track.id, rgbString)
@@ -171,35 +169,6 @@ class CircularView {
             }
 
         new Picker(pickerConfig)
-
-        // set track opacity
-        // const label = document.createElement('label')
-        // trackPanelRow.appendChild(label)
-        // label.innerText = 'Alpha'
-        //
-        // element = document.createElement('input')
-        // label.appendChild(element)
-        // element.type = 'text'
-        // element.value = track.alpha.toString()
-        // element.addEventListener('change', event => {
-        //     event.stopPropagation()
-        //     event.preventDefault()
-        //     this.setTrackAlpha(track.id, parseFloat(event.target.value))
-        // })
-
-        // delete track
-        element = document.createElement('button')
-        trackPanelRow.appendChild(element)
-        element.innerText = 'Delete'
-        element.addEventListener('click', event => {
-            this.deleteTrack(track.id)
-            trackPanelRow.remove()
-
-            if (0 === this.trackPanel.querySelectorAll('div').length) {
-                this.trackPanelPresentationButton.innerText = 'Show Track Options'
-                this.trackPanel.style.display = 'none'
-            }
-        })
 
     }
 
