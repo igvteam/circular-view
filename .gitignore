@@ -1,6 +1,5 @@
 # Optional npm cache directory
 .npm
-
 .DS_STORE
 /circular-view.iml
 /app/build/
