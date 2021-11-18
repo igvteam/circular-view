@@ -66,8 +66,8 @@
         }
 
     const circularView = new CircularView(document.querySelector('.jbrowse-container'), config);
-    
-    circularView.setSize(512)
+
+    circularView.setSize(768)
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));

@@ -159,29 +159,33 @@ class CircularView {
         const pickerConfig =
             {
                 parent: pickerButton,
-                alpha: false,
-                editorFormat: 'rgb',
-                onChange: ({ rgbString }) => {
-                    this.setTrackColor(track.id, rgbString);
+                // alpha: false,
+                // editorFormat: 'rgb',
+                // onChange: ({ rgbString }) => {
+                //     this.setTrackColor(track.id, rgbString);
+                // },
+                onChange: ({ rgba, rgbString }) => {
+                    this.setTrackAlpha(track.id, parseFloat(rgba[ 3 ]))
+                    this.setTrackColor(track.id, rgbString)
                 },
             }
 
         new Picker(pickerConfig)
 
         // set track opacity
-        const label = document.createElement('label')
-        trackPanelRow.appendChild(label)
-        label.innerText = 'Alpha'
-
-        element = document.createElement('input')
-        label.appendChild(element)
-        element.type = 'text'
-        element.value = track.alpha.toString()
-        element.addEventListener('change', event => {
-            event.stopPropagation()
-            event.preventDefault()
-            this.setTrackAlpha(track.id, parseFloat(event.target.value))
-        })
+        // const label = document.createElement('label')
+        // trackPanelRow.appendChild(label)
+        // label.innerText = 'Alpha'
+        //
+        // element = document.createElement('input')
+        // label.appendChild(element)
+        // element.type = 'text'
+        // element.value = track.alpha.toString()
+        // element.addEventListener('change', event => {
+        //     event.stopPropagation()
+        //     event.preventDefault()
+        //     this.setTrackAlpha(track.id, parseFloat(event.target.value))
+        // })
 
         // delete track
         element = document.createElement('button')
