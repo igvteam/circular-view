@@ -1,6 +1,5 @@
 $jbrowse-font-face: 'Open Sans', sans-serif;
 $jbrowse-toolbar-height: 32px;
-$jbrowse-circular-genome-view-size: 640px;
 
 .jbrowse-container {
 
@@ -21,6 +20,13 @@ $jbrowse-circular-genome-view-size: 640px;
 
   width: fit-content;
   height: fit-content;
+
+  color: dimgray;
+  font-family: $jbrowse-font-face;
+  font-size: 12px;
+  //font-weight: 700;
+
+  background-color: white;
 }
 
 .jbrowse-toolbar {
@@ -44,17 +50,12 @@ $jbrowse-circular-genome-view-size: 640px;
 }
 
 .jbrowse-circular-genome-view {
-  //background-color: grey;
-  //width: $jbrowse-circular-genome-view-size;
-  //height: $jbrowse-circular-genome-view-size;
 }
 
 .jbrowse-toolbar-button-container {
 
   height: 100%;
   width: fit-content;
-
-  //background-color: darkseagreen;
 
   display: flex;
   flex-flow: row;
@@ -63,6 +64,7 @@ $jbrowse-circular-genome-view-size: 640px;
   align-items: center;
 
   button {
+    cursor: pointer;
     margin-left: 4px;
     margin-right: 4px;
   }
@@ -83,11 +85,6 @@ $jbrowse-circular-genome-view-size: 640px;
   border-bottom-color: dimgray;
   border-bottom-width: thin;
 
-  color: dimgray;
-  font-family: $jbrowse-font-face;
-  font-size: 12px;
-  font-weight: 700;
-
   display: flex;
   flex-flow: column;
   flex-wrap: nowrap;
@@ -97,18 +94,26 @@ $jbrowse-circular-genome-view-size: 640px;
   // track tools
   >div {
     width: 100%;
-    height: 28px;
+    height: fit-content;
 
     background-color: white;
 
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+
+    // Hide/Show | Set Color & Alpha
+    >button {
+      cursor: pointer;
+      margin: 8px;
+    }
 
     // track name
     >div {
+
+      font-weight: 700;
 
       margin-left: 4px;
       vertical-align: middle;
@@ -121,26 +126,12 @@ $jbrowse-circular-genome-view-size: 640px;
       text-overflow: ellipsis;
 
       height: fit-content;
-      width: 96px;
-    }
-
-    >label {
-
-      >input {
-        margin-left: 4px;
-        text-align: center;
-        width: 32px;
-      }
-
-    }
-
-    >button:last-child {
-      margin-right: 4px;
+      width: 160px;
     }
   }
 
-  >div:nth-child(odd) {
-    background-color: rgb(245, 245, 245);
+  >div:hover {
+    background-color: #f4f4f4;
   }
 
 }

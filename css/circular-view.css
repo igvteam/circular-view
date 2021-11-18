@@ -11,7 +11,11 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: fit-content;
-  height: fit-content; }
+  height: fit-content;
+  color: dimgray;
+  font-family: "Open Sans", sans-serif;
+  font-size: 12px;
+  background-color: white; }
 
 .jbrowse-toolbar {
   position: relative;
@@ -36,6 +40,7 @@
   justify-content: flex-start;
   align-items: center; }
   .jbrowse-toolbar-button-container button {
+    cursor: pointer;
     margin-left: 4px;
     margin-right: 4px; }
 
@@ -49,10 +54,6 @@
   border-bottom-style: solid;
   border-bottom-color: dimgray;
   border-bottom-width: thin;
-  color: dimgray;
-  font-family: "Open Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 700;
   display: flex;
   flex-flow: column;
   flex-wrap: nowrap;
@@ -60,14 +61,18 @@
   align-items: center; }
   .jbrowse-track-panel > div {
     width: 100%;
-    height: 28px;
+    height: fit-content;
     background-color: white;
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center; }
+    .jbrowse-track-panel > div > button {
+      cursor: pointer;
+      margin: 8px; }
     .jbrowse-track-panel > div > div {
+      font-weight: 700;
       margin-left: 4px;
       vertical-align: middle;
       padding-left: 4px;
@@ -76,14 +81,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
       height: fit-content;
-      width: 96px; }
-    .jbrowse-track-panel > div > label > input {
-      margin-left: 4px;
-      text-align: center;
-      width: 32px; }
-    .jbrowse-track-panel > div > button:last-child {
-      margin-right: 4px; }
-  .jbrowse-track-panel > div:nth-child(odd) {
-    background-color: whitesmoke; }
+      width: 160px; }
+  .jbrowse-track-panel > div:hover {
+    background-color: #f4f4f4; }
 
 /*# sourceMappingURL=circular-view.css.map */

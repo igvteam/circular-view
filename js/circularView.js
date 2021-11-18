@@ -131,10 +131,6 @@ class CircularView {
 
         let element
 
-        // track name
-        element = document.createElement('div')
-        trackPanelRow.appendChild(element)
-        element.innerText = element.title = `${track.name}-${track.name}-${track.name}`
 
         // track hide|show
         element = document.createElement('button')
@@ -154,13 +150,13 @@ class CircularView {
 
         // track color & alpha
         const pickerButton = document.createElement('button')
-        pickerButton.innerText = 'Color & Alpha'
+        pickerButton.innerText = 'Set Color & Alpha'
         trackPanelRow.appendChild(pickerButton)
 
         const pickerConfig =
             {
                 parent: pickerButton,
-                popup: 'left',
+                popup: 'right',
                 editorFormat: 'rgb',
                 color:track.color,
                 onChange: ({ rgba, rgbString }) => {
@@ -170,6 +166,11 @@ class CircularView {
             }
 
         new Picker(pickerConfig)
+
+        // track name
+        element = document.createElement('div')
+        trackPanelRow.appendChild(element)
+        element.innerText = element.title = track.name
 
     }
 
