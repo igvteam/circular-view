@@ -12,5 +12,8 @@
     "igv"
   ],
   "author": "Jim Robinson <jrobinso@ucsd.edu>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vanilla-picker": "^2.12.1"
+  }
 }
