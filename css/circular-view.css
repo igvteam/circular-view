@@ -1,4 +1,5 @@
 .jbrowse-container {
+  z-index: 2048;
   position: absolute;
   box-sizing: content-box;
   border-color: dimgray;

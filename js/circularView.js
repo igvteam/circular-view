@@ -316,6 +316,10 @@ class CircularView {
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
     setSize(size) {
+
+        this.container.style.width =  `${ size }px`
+        this.container.style.height = `${ size }px`
+
         if (this.viewState) {
             size -= 45;
             const view = this.viewState.session.view;

@@ -4,6 +4,7 @@ $jbrowse-circular-genome-view-size: 640px;
 
 .jbrowse-container {
 
+  z-index: 2048;
   position: absolute;
 
   box-sizing: content-box;

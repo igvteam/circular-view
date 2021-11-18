@@ -4,35 +4,38 @@
     <meta charset="UTF-8">
     <title>Circular Genome View</title>
 
+    <!-- Vanilla Picker CSS -->
+    <link rel="stylesheet" href="../css/vanilla-picker.csp.css">
+
     <!-- CSS -->
     <link rel="stylesheet" href="../css/circular-view.css">
 
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="anonymous"></script>
-    <!--    <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.development.js"
-                crossorigin="anonymous"></script>-->
-    <script
-            src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"
-            crossorigin="anonymous"
-    ></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"></script>
 
-    <!--    <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"
-                crossorigin></script>-->
-    <style>
-        button[data-testid='circular_track_select'] {
-            display: none;
-        }
-    </style>
+    <!-- Vanilla Picker JS -->
+    <script src="../js/vanilla-picker.csp.js"></script>
+
+
 </head>
 <body>
 
 <p>
     <button id="hg19">Genome hg19</button>
     <button id="mm10">Genome mm10</button>
-    <button id="sniffles">Sniffles</button>
-    <button id="delly">Delly</button>
+    <label for="size-input">
+        <input id="size-input" type="text" name="circular-view-size">
+        Set Size
+    </label>
+</p>
+<p>
+    Sniffles:
+    <button id="sifflesLoad">Load</button>
+</p>
+<p>
+    Delly:
+    <button id="dellyLoad">Load</button>
 </p>
 
 <div class='jbrowse-container'></div>
@@ -43,11 +46,12 @@
 
     import hg19 from "./hg19.js";
     import mm10 from "./mm10.js"
-    import snifflesTrack from "./snifflesTrack.js";
-    import dellyTrack from "./dellyTrack.js";
+    import snifflesData from "./snifflesTrackData.js";
+    import dellyData from "./dellyTrackData.js";
 
     const config =
         {
+            assembly: hg19,
             onChordClick: (feature) => {
                 const f1 = feature.data;
                 const f2 = f1.mate;
@@ -62,27 +66,53 @@
         }
 
     const circularView = new CircularView(document.querySelector('.jbrowse-container'), config);
+    
+    circularView.setSize(512)
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
-    document.getElementById("sniffles").addEventListener("click", e => toggleTrack(e, snifflesTrack));
-    document.getElementById("delly").addEventListener("click", e => toggleTrack(e, dellyTrack));
 
-    function toggleTrack(e, track) {
-        const t = circularView.getTrack(track.id);
-        if(!t) {
-            // Load
-            e.target.style.backgroundColor = track.color;
-            circularView.addChords(track.chords, track)
-        } else {
+    document.getElementById('size-input').addEventListener('keyup', event => {
+        event.preventDefault()
+        event.stopPropagation()
+        if (13 === event.keyCode) {
+            circularView.setSize(Number.parseInt(event.target.value))
+        }
+    })
+
+    document.getElementById("sifflesLoad").addEventListener("click", e => loadTrack(snifflesData));
+    document.getElementById("dellyLoad").addEventListener("click", e => loadTrack(dellyData));
+
+    function loadTrack(data) {
+        const track = data.track;
+        const chords = data.chords;
+        circularView.addChords(chords, track);
+    }
+
+    function toggleTrack(e, id) {
+        const t = circularView.getTrack(id);
+        if(t) {
             // Toggle visibility
-            if(t.visible) {
-                circularView.hideTrack(track.id);
+            if (t.visible) {
+                circularView.hideTrack(id);
+                e.target.innerText = "Show"
             } else {
-                circularView.showTrack(track.id);
+                circularView.showTrack(id);
+                e.target.innerText = "Hide";
             }
         }
     }
+
+    function colorTrack(id) {
+        const color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`;
+        circularView.setTrackColor(id, color);
+    }
+
+    function alphaTrack(id, value) {
+        const alpha = Number(value);
+        circularView.setTrackAlpha(id, alpha);
+    }
+
 
 </script>
 
