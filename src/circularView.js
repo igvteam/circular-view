@@ -149,7 +149,7 @@ class CircularView {
         })
 
         // track color
-        const pickerButton = document.createElement('div')
+        const pickerButton = document.createElement('button')
         pickerButton.className = 'igv-circview-button'
         pickerButton.innerText = 'Color & Transparency'
         trackPanelRow.appendChild(pickerButton)
