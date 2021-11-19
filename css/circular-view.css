@@ -1,4 +1,4 @@
-.jbrowse-container {
+.igv-circview-container {
   z-index: 2048;
   position: absolute;
   box-sizing: content-box;
@@ -17,7 +17,7 @@
   font-size: 12px;
   background-color: white; }
 
-.jbrowse-toolbar {
+.igv-circview-toolbar {
   position: relative;
   width: 100%;
   height: 32px;
@@ -31,7 +31,7 @@
   justify-content: space-between;
   align-items: center; }
 
-.jbrowse-toolbar-button-container {
+.igv-circview-toolbar-button-container {
   height: 100%;
   width: fit-content;
   display: flex;
@@ -39,12 +39,12 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center; }
-  .jbrowse-toolbar-button-container button {
+  .igv-circview-toolbar-button-container button {
     cursor: pointer;
     margin-left: 4px;
     margin-right: 4px; }
 
-.jbrowse-track-panel {
+.igv-circview-track-panel {
   z-index: 1024;
   position: absolute;
   top: 33px;
@@ -59,7 +59,9 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center; }
-  .jbrowse-track-panel > div {
+  .igv-circview-track-panel > div {
+    padding-top: 5px;
+    padding-bottom: 5px;
     width: 100%;
     height: fit-content;
     background-color: white;
@@ -68,11 +70,10 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center; }
-    .jbrowse-track-panel > div > button {
+    .igv-circview-track-panel > div > button {
       cursor: pointer;
       margin: 8px; }
-    .jbrowse-track-panel > div > div {
-      font-weight: 700;
+    .igv-circview-track-panel > div > div {
       margin-left: 4px;
       vertical-align: middle;
       padding-left: 4px;
@@ -81,8 +82,31 @@
       overflow: hidden;
       text-overflow: ellipsis;
       height: fit-content;
-      width: 160px; }
-  .jbrowse-track-panel > div:hover {
+   }
+  .igv-circview-track-panel > div:hover {
     background-color: #f4f4f4; }
+
+.igv-circview-button {
+  display:inline-block;
+  color:#444;
+  border:1px solid #8d8b8b;
+  border-radius: 4px;
+  background: rgb(239,239,239);
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+  cursor:pointer;
+  vertical-align:middle;
+  padding: 5px;
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  font-size: 12px;
+}
+.igv-circview-button:hover {
+  background: rgb(239,239,239);
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}
+.igv-circview-button:active {
+  color: #007bff;
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}
 
 /*# sourceMappingURL=circular-view.css.map */

@@ -1,11 +1,11 @@
 import Picker from '../node_modules/vanilla-picker/dist/vanilla-picker.mjs'
-import {getChrColor} from "./chrColor.js";
-import IGVColor from "./igv-color.js";
+import {getChrColor} from "./chrColor.js"
+import IGVColor from "./igv-color.js"
 
 class CircularView {
 
     static isInstalled() {
-        return window["JBrowseReactCircularGenomeView"] !== undefined && window["React"] !== undefined && window["ReactDOM"] !== undefined;
+        return window["JBrowseReactCircularGenomeView"] !== undefined && window["React"] !== undefined && window["ReactDOM"] !== undefined
     }
 
     /**
@@ -27,16 +27,17 @@ class CircularView {
             // toolbar
             this.createToolbarAndTrackPanel(parent)
 
+
             let element
 
             // circular view container
             element = document.createElement('div')
-            element.className = 'jbrowse-circular-genome-view'
+            element.className = 'igv-circview-circular-genome-view'
             parent.appendChild(element)
             this.container = element
 
 
-            this.config = config;
+            this.config = config
 
             if (config.assembly) {
                 this.setAssembly(config.assembly)
@@ -55,31 +56,28 @@ class CircularView {
 
         // toolbar
         element = document.createElement('div')
-        element.className = 'jbrowse-toolbar'
+        element.className = 'igv-circview-toolbar'
         parent.appendChild(element)
         this.toolbar = element
 
 
         // track panel
         element = document.createElement('div')
-        element.className = 'jbrowse-track-panel'
+        element.className = 'igv-circview-track-panel'
         parent.appendChild(element)
         this.trackPanel = element
 
         this.trackPanel.style.display = 'none'
 
 
-        let buttonContainer
-
         // toolbar button container - Track Options - Clear All
-        buttonContainer = document.createElement('div')
-        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        let buttonContainer = document.createElement('div')
+        buttonContainer.className = 'igv-circview-toolbar-button-container'
         this.toolbar.appendChild(buttonContainer)
 
-        let button
-
         // Track Options
-        this.trackPanelPresentationButton = document.createElement('button')
+        this.trackPanelPresentationButton = document.createElement('div')
+        this.trackPanelPresentationButton.className = 'igv-circview-button'
         buttonContainer.appendChild(this.trackPanelPresentationButton)
         this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options'
         this.trackPanelPresentationButton.addEventListener('click', (event) => {
@@ -101,7 +99,8 @@ class CircularView {
         })
 
         // Clear All Chords
-        button = document.createElement('button')
+        let button = document.createElement('div')
+        button.className = 'igv-circview-button'
         buttonContainer.appendChild(button)
         button.innerText = 'Clear All'
         button.addEventListener('click', () => {
@@ -111,13 +110,14 @@ class CircularView {
 
         // toolbar button container - Close Window
         buttonContainer = document.createElement('div')
-        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        buttonContainer.className = 'igv-circview-toolbar-button-container'
         this.toolbar.appendChild(buttonContainer)
 
         // Close Window
-        button = document.createElement('button')
+        button = document.createElement('div')
+        button.className = 'igv-circview-button'
         buttonContainer.appendChild(button)
-        button.innerText = 'Close Window'
+        button.innerText = 'Close'
         button.addEventListener('click', () => {
             this.visible = false
         })
@@ -133,11 +133,11 @@ class CircularView {
 
 
         // track hide|show
-        element = document.createElement('button')
+        element = document.createElement('div')
+        element.className = 'igv-circview-button'
         trackPanelRow.appendChild(element)
         element.innerText = true === track.visible ? 'Hide' : 'Show'
         element.addEventListener('click', event => {
-
             if (true === track.visible) {
                 this.hideTrack(track.id)
                 event.target.innerText = "Show"
@@ -148,9 +148,10 @@ class CircularView {
 
         })
 
-        // track color & alpha
-        const pickerButton = document.createElement('button')
-        pickerButton.innerText = 'Set Color & Alpha'
+        // track color
+        const pickerButton = document.createElement('div')
+        pickerButton.className = 'igv-circview-button'
+        pickerButton.innerText = 'Color & Transparency'
         trackPanelRow.appendChild(pickerButton)
 
         const pickerConfig =
@@ -158,11 +159,10 @@ class CircularView {
                 parent: pickerButton,
                 popup: 'right',
                 editorFormat: 'rgb',
-                color:track.color,
-                onChange: ({ rgba, rgbString }) => {
-                    this.setTrackAlpha(track.id, parseFloat(rgba[ 3 ]))
-                    this.setTrackColor(track.id, rgbString)
-                },
+                color: track.color,
+                onChange: ({rgbaString}) => {
+                    this.setTrackColor(track.id, rgbaString)
+                }
             }
 
         new Picker(pickerConfig)
@@ -182,17 +182,17 @@ class CircularView {
     setAssembly(igvGenome) {
 
         if (this.genomeId === igvGenome.id) {
-            return;
+            return
         }
-        this.tracks = [];
-        this.genomeId = igvGenome.id;
-        this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)));
+        this.tracks = []
+        this.genomeId = igvGenome.id
+        this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)))
 
-        const regions = [];
-        const colors = [];
+        const regions = []
+        const colors = []
         for (let chr of igvGenome.chromosomes) {
-            const shortName = shortChrName(chr.name);
-            colors.push(chr.color || getChrColor(shortName));
+            const shortName = shortChrName(chr.name)
+            colors.push(chr.color || getChrColor(shortName))
             regions.push(
                 {
                     refName: shortName,
@@ -216,7 +216,7 @@ class CircularView {
             refNameColors: colors
         }
 
-        this.render();
+        this.render()
 
     }
 
@@ -247,44 +247,40 @@ class CircularView {
 
     addChords(newChords, options = {}) {
 
-        const name = options.track || options.name || "*";
+        const name = options.track || options.name || "*"
 
-        let track = this.tracks.find(t => name === t.name);
+        let track = this.tracks.find(t => name === t.name)
 
         // Override track options or create new track
         if (track) {
             if (options.color) {
-                track.color = options.color;
-            }
-            if (options.alpha) {
-                track.alpha = options.alpha
+                track.color = options.color
             }
         } else {
             track =
                 {
-                name,
-                chords: [],
-                color: options.color || "black",
-                alpha: options.alpha || 0.5,
-                visible: true,
-                id: options.id || guid()
-            }
+                    name,
+                    chords: [],
+                    color: options.color || "black",
+                    visible: true,
+                    id: options.id || guid()
+                }
             this.tracks.push(track)
 
             this.addToTrackPanel(track)
         }
 
         // Append chords to track
-        const currentIDs = new Set(track.chords.map(c => c.uniqueId));
+        const currentIDs = new Set(track.chords.map(c => c.uniqueId))
         for (let c of newChords) {
             if (!currentIDs.has(c.uniqueId) &&
                 this.chrNames.has(shortChrName(c.refName)) &&
                 this.chrNames.has(shortChrName(c.mate.refName))) {
-                track.chords.push(c);
-                currentIDs.add(c.uniqueId);
+                track.chords.push(c)
+                currentIDs.add(c.uniqueId)
             }
         }
-        this.render();
+        this.render()
     }
 
     /**
@@ -292,29 +288,29 @@ class CircularView {
      */
     setSize(size) {
 
-        this.container.style.width =  `${ size }px`
-        this.container.style.height = `${ size }px`
+        this.container.style.width = `${size}px`
+        this.container.style.height = `${size}px`
 
         if (this.viewState) {
-            size -= 45;
-            const view = this.viewState.session.view;
-            view.setWidth(size);
-            view.setHeight(size /* this is the height of the area inside the border in pixels */);
-            view.setBpPerPx(view.minBpPerPx);
+            size -= 45
+            const view = this.viewState.session.view
+            view.setWidth(size)
+            view.setHeight(size /* this is the height of the area inside the border in pixels */)
+            view.setBpPerPx(view.minBpPerPx)
         }
     }
 
     getSize() {
-        return this.container.clientWidth;
+        return this.container.clientWidth
     }
 
     clearChords() {
-        this.tracks = [];
-        this.render();
+        this.tracks = []
+        this.render()
     }
 
     clearSelection() {
-        this.viewState.pluginManager.rootModel.session.clearSelection();
+        this.viewState.pluginManager.rootModel.session.clearSelection()
     }
 
     getFeature(featureId) {
@@ -324,10 +320,10 @@ class CircularView {
         // const feature = display.data.features.get(featureId)
         // return feature;
 
-        const features = [...this.viewState.config.tracks[0].adapter.features.value];
+        const features = [...this.viewState.config.tracks[0].adapter.features.value]
         for (let f of features) {
             if (featureId === f.uniqueId) {
-                return f;
+                return f
             }
         }
     }
@@ -336,86 +332,69 @@ class CircularView {
      * Deprecated, use "visible" property
      */
     show() {
-        this.parent.style.display = 'block';
+        this.parent.style.display = 'block'
     }
 
     /**
      * Deprecated, use "visible" property
      */
     hide() {
-        this.parent.style.display = 'none';
+        this.parent.style.display = 'none'
     }
 
     get visible() {
-        return this.parent.style.display !== 'none';
+        return this.parent.style.display !== 'none'
     }
 
     set visible(isVisible) {
-        this.parent.style.display = isVisible ? 'block' : 'none';
+        this.parent.style.display = isVisible ? 'block' : 'none'
     }
 
     hideTrack(trackID) {
-        let track = this.tracks.find(t => trackID === t.id);
+        let track = this.tracks.find(t => trackID === t.id)
         if (track) {
-            track.visible = false;
-            this.render();
+            track.visible = false
+            this.render()
         } else {
             console.warn(`No track with name: ${name}`)
         }
     }
 
     showTrack(trackID) {
-        let idx = this.tracks.findIndex(t => trackID === t.id);
+        let idx = this.tracks.findIndex(t => trackID === t.id)
         if (idx >= 0) {
-            const track = this.tracks[idx];
-            track.visible = true;
-            this.tracks.splice(idx, 1);   // Change z-order
-            this.tracks.push(track);
-            this.render();
+            const track = this.tracks[idx]
+            track.visible = true
+            this.tracks.splice(idx, 1)   // Change z-order
+            this.tracks.push(track)
+            this.render()
         } else {
             console.warn(`No track with name: ${name}`)
         }
     }
 
     deleteTrack(trackID) {
-        let idx = this.tracks.findIndex(t => trackID === t.id);
+        let idx = this.tracks.findIndex(t => trackID === t.id)
         if (idx >= 0) {
-            this.tracks.splice(idx, 1);
+            this.tracks.splice(idx, 1)
         }
-        this.render();
+        this.render()
     }
 
     getTrack(trackID) {
-        return this.tracks.find(t => trackID === t.id);
+        return this.tracks.find(t => trackID === t.id)
     }
 
     setTrackColor(trackID, color) {
-        const t = this.getTrack(trackID);
+        const t = this.getTrack(trackID)
         if (t) {
-            t.color = color;
-            this.updateTrackColorAlpha(t)
-        }
-    }
-
-    setTrackAlpha(trackID, alpha) {
-        const t = this.getTrack(trackID);
-        if (t) {
-            t.alpha = alpha;
-            this.updateTrackColorAlpha(t)
-        }
-    }
-
-    updateTrackColorAlpha(t) {
-        const trackID = t.id;
-        let color = t.color || "black";
-        if (t.alpha) {
-            color = IGVColor.addAlpha(color, t.alpha);
-        }
-
-        for (let jbrowseTrack of this.viewState.config.tracks) {
-            if (trackID === jbrowseTrack.trackId) {
-                jbrowseTrack.displays[0].renderer.strokeColor.set(color);
-                break;
+            t.color = color
+            const trackID = t.id
+            for (let jbrowseTrack of this.viewState.config.tracks) {
+                if (trackID === jbrowseTrack.trackId) {
+                    jbrowseTrack.displays[0].renderer.strokeColor.set(color)
+                    break
+                }
             }
         }
     }
@@ -429,15 +408,15 @@ class CircularView {
         const {
             createViewState,
             JBrowseCircularGenomeView,
-        } = JBrowseReactCircularGenomeView;
+        } = JBrowseReactCircularGenomeView
 
         // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
-        ReactDOM.unmountComponentAtNode(this.container);
+        ReactDOM.unmountComponentAtNode(this.container)
 
-        const visibleTracks = this.tracks.filter(t => false !== t.visible);
+        const visibleTracks = this.tracks.filter(t => false !== t.visible)
 
-        const jbrowseTracks = [];
-        const colors = [];
+        const jbrowseTracks = []
+        const colors = []
 
         for (let trackConfig of visibleTracks) {
             jbrowseTracks.push({
@@ -450,49 +429,49 @@ class CircularView {
                     features: trackConfig.chords,
                 }
             })
-            colors.push(trackConfig.color);
+            colors.push(trackConfig.color)
 
         }
 
         this.viewState = createViewState({
             assembly: this.assembly,
             tracks: jbrowseTracks,
-        });
+        })
 
         // Set view colors
         for (let i = 0; i < visibleTracks.length; i++) {
-            this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set(colors[i]);
+            this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set(colors[i])
             //this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
             //this.viewState.config.tracks[i].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
         }
 
-        this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState});
-        this.setSize(this.container.clientWidth);
+        this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState})
+        this.setSize(this.container.clientWidth)
 
-        ReactDOM.render(this.element, this.container);
+        ReactDOM.render(this.element, this.container)
 
         for (let i = 0; i < visibleTracks.length; i++) {
-            this.viewState.session.view.showTrack(this.viewState.config.tracks[i].trackId);
+            this.viewState.session.view.showTrack(this.viewState.config.tracks[i].trackId)
             if (this.config.onChordClick) {
-                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick);
+                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick)
                 this.viewState.config.tracks[i].displays[0].onChordClick.set(
                     'jexl:onChordClick(feature, track, pluginManager)'
-                );
+                )
             }
         }
     }
 }
 
 function shortChrName(chrName) {
-    return chrName.startsWith("chr") ? chrName.substring(3) : chrName;
+    return chrName.startsWith("chr") ? chrName.substring(3) : chrName
 }
 
 function defaultOnChordClick(feature, chordTrack, pluginManager) {
-    console.log(feature);
+    console.log(feature)
 }
 
 function guid() {
-    return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
+    return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4)
 }
 
-export default CircularView;
+export default CircularView

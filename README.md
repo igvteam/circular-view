@@ -3,7 +3,7 @@
 A wrapper class for JBrowse genomic circular view component for use by IGV projects.  This class is tailored for
 IGV use cases, for general see the JBrowse project:
 
-* [https://github.com/GMOD/jbrowse-components/tree/main/products/jbrowse-react-circular-genome-view](https://github.com/GMOD/jbrowse-components/tree/main/products/jbrowse-react-circular-genome-view)
+* [https://github.com/GMOD/igv-circview-components/tree/main/products/igv-circview-react-circular-genome-view](https://github.com/GMOD/igv-circview-components/tree/main/products/igv-circview-react-circular-genome-view)
 
 
 ## API
@@ -53,10 +53,9 @@ IGV use cases, for general see the JBrowse project:
      
      ```
       {
-          id: string       // Unique id -- optional, will be generated if absent
+          id: string,       // Unique id -- optional, will be generated if absent
           name: string,    // Track name
-          color: string,   // Track color
-          alpha: number    // Alpha transparency,  0 <= alpha <= 1
+          color: string   // Track color
        }
      ```
   
@@ -69,6 +68,5 @@ IGV use cases, for general see the JBrowse project:
 
 * setTrackColor( id, color)  -- Set the color of the specified track
 
-* setTrackAlpha( id, alpha)  -- Set the alpha of the specified track
 
 

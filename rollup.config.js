@@ -1,6 +1,6 @@
 export default [
     {
-        input: 'js/index.js',
+        input: 'src/index.js',
         output:
             [
                 {

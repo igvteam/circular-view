@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@jbrowse/react-circular-genome-view/dist/react-circular-genome-view.umd.production.min.js"></script>
 
+    <link rel="stylesheet" href="../css/circular-view.css">
+
 </head>
 <body>
 
@@ -24,11 +26,11 @@
     <button id="dellyLoad">Load</button>
 </p>
 
-<div class='jbrowse-container'></div>
+<div class='igv-circview-container'></div>
 
 <script type="module">
 
-    import { CircularView } from "../js/index.js";
+    import { CircularView } from "../src/index.js";
 
     import hg19 from "./hg19.js";
     import mm10 from "./mm10.js"
@@ -51,7 +53,7 @@
             }
         }
 
-    const circularView = new CircularView(document.querySelector('.jbrowse-container'), config);
+    const circularView = new CircularView(document.querySelector('.igv-circview-container'), config);
 
     circularView.setSize(768)
 
