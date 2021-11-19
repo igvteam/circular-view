@@ -75,7 +75,9 @@ $jbrowse-toolbar-height: 32px;
 
   z-index: 1024;
   position: absolute;
-  top: $jbrowse-toolbar-height;
+
+  // need to account for toolbar bottom border width
+  top: $jbrowse-toolbar-height + 1px;
   left:0;
 
   width: 100%;
