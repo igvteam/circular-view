@@ -1,3 +1,4 @@
+import Picker from '../node_modules/vanilla-picker/dist/vanilla-picker.mjs'
 import {getChrColor} from "./chrColor.js";
 import IGVColor from "./igv-color.js";
 
@@ -10,29 +11,167 @@ class CircularView {
     /**
      * Create a new CircularView
      *
-     * @param div
+     * @param parent
      * @param config - configuration options
      *   {
      *       assembly: {name: string, id: string, chromosomes: [{name: string, bpLength: integer, color: string}]
      *       onChordClick: function called upon chord click with chord feature as argument
      *   }
      */
-    constructor(div, config) {
+    constructor(parent, config) {
         config = config || {}
         if (CircularView.isInstalled()) {
 
-            this.container = div;
+            this.parent = parent
+
+            // toolbar
+            this.createToolbarAndTrackPanel(parent)
+
+            let element
+
+            // circular view container
+            element = document.createElement('div')
+            element.className = 'jbrowse-circular-genome-view'
+            parent.appendChild(element)
+            this.container = element
+
+
             this.config = config;
 
             if (config.assembly) {
                 this.setAssembly(config.assembly)
             }
 
-            this.tracks = [];
+            this.tracks = []
 
         } else {
-            console.error("JBrowse circular view is not installed");
+            console.error("JBrowse circular view is not installed")
         }
+    }
+
+    createToolbarAndTrackPanel(parent) {
+
+        let element
+
+        // toolbar
+        element = document.createElement('div')
+        element.className = 'jbrowse-toolbar'
+        parent.appendChild(element)
+        this.toolbar = element
+
+
+        // track panel
+        element = document.createElement('div')
+        element.className = 'jbrowse-track-panel'
+        parent.appendChild(element)
+        this.trackPanel = element
+
+        this.trackPanel.style.display = 'none'
+
+
+        let buttonContainer
+
+        // toolbar button container - Track Options - Clear All
+        buttonContainer = document.createElement('div')
+        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        this.toolbar.appendChild(buttonContainer)
+
+        let button
+
+        // Track Options
+        this.trackPanelPresentationButton = document.createElement('button')
+        buttonContainer.appendChild(this.trackPanelPresentationButton)
+        this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options'
+        this.trackPanelPresentationButton.addEventListener('click', (event) => {
+
+            const trackPanelRows = this.trackPanel.querySelectorAll('div')
+
+            if (trackPanelRows.length > 0) {
+
+                if ('none' === this.trackPanel.style.display) {
+                    this.trackPanel.style.display = 'flex'
+                    event.target.innerText = 'Hide Track Options'
+                } else {
+                    this.trackPanel.style.display = 'none'
+                    event.target.innerText = 'Show Track Options'
+                }
+
+            }
+
+        })
+
+        // Clear All Chords
+        button = document.createElement('button')
+        buttonContainer.appendChild(button)
+        button.innerText = 'Clear All'
+        button.addEventListener('click', () => {
+            this.clearChords()
+        })
+
+
+        // toolbar button container - Close Window
+        buttonContainer = document.createElement('div')
+        buttonContainer.className = 'jbrowse-toolbar-button-container'
+        this.toolbar.appendChild(buttonContainer)
+
+        // Close Window
+        button = document.createElement('button')
+        buttonContainer.appendChild(button)
+        button.innerText = 'Close Window'
+        button.addEventListener('click', () => {
+            this.visible = false
+        })
+
+    }
+
+    addToTrackPanel(track) {
+
+        const trackPanelRow = document.createElement('div')
+        this.trackPanel.appendChild(trackPanelRow)
+
+        let element
+
+
+        // track hide|show
+        element = document.createElement('button')
+        trackPanelRow.appendChild(element)
+        element.innerText = true === track.visible ? 'Hide' : 'Show'
+        element.addEventListener('click', event => {
+
+            if (true === track.visible) {
+                this.hideTrack(track.id)
+                event.target.innerText = "Show"
+            } else {
+                this.showTrack(track.id)
+                event.target.innerText = "Hide"
+            }
+
+        })
+
+        // track color & alpha
+        const pickerButton = document.createElement('button')
+        pickerButton.innerText = 'Set Color & Alpha'
+        trackPanelRow.appendChild(pickerButton)
+
+        const pickerConfig =
+            {
+                parent: pickerButton,
+                popup: 'right',
+                editorFormat: 'rgb',
+                color:track.color,
+                onChange: ({ rgba, rgbString }) => {
+                    this.setTrackAlpha(track.id, parseFloat(rgba[ 3 ]))
+                    this.setTrackColor(track.id, rgbString)
+                },
+            }
+
+        new Picker(pickerConfig)
+
+        // track name
+        element = document.createElement('div')
+        trackPanelRow.appendChild(element)
+        element.innerText = element.title = track.name
+
     }
 
     /**
@@ -121,15 +260,18 @@ class CircularView {
                 track.alpha = options.alpha
             }
         } else {
-            track = {
-                name: name,
+            track =
+                {
+                name,
                 chords: [],
                 color: options.color || "black",
                 alpha: options.alpha || 0.5,
                 visible: true,
                 id: options.id || guid()
             }
-            this.tracks.push(track);
+            this.tracks.push(track)
+
+            this.addToTrackPanel(track)
         }
 
         // Append chords to track
@@ -145,11 +287,14 @@ class CircularView {
         this.render();
     }
 
-
     /**
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
     setSize(size) {
+
+        this.container.style.width =  `${ size }px`
+        this.container.style.height = `${ size }px`
+
         if (this.viewState) {
             size -= 45;
             const view = this.viewState.session.view;
@@ -159,11 +304,9 @@ class CircularView {
         }
     }
 
-
     getSize() {
         return this.container.clientWidth;
     }
-
 
     clearChords() {
         this.tracks = [];
@@ -193,22 +336,22 @@ class CircularView {
      * Deprecated, use "visible" property
      */
     show() {
-        this.container.style.display = 'block';
+        this.parent.style.display = 'block';
     }
 
     /**
      * Deprecated, use "visible" property
      */
     hide() {
-        this.container.style.display = 'none';
+        this.parent.style.display = 'none';
     }
 
     get visible() {
-        return this.container.style.display !== 'none';
+        return this.parent.style.display !== 'none';
     }
 
     set visible(isVisible) {
-        this.container.style.display = isVisible ? 'block' : 'none';
+        this.parent.style.display = isVisible ? 'block' : 'none';
     }
 
     hideTrack(trackID) {
@@ -276,7 +419,6 @@ class CircularView {
             }
         }
     }
-
 
     /**
      * The main render function.  Render here means build the React DOM.  Trying to change react state dynamically
@@ -349,10 +491,8 @@ function defaultOnChordClick(feature, chordTrack, pluginManager) {
     console.log(feature);
 }
 
-
 function guid() {
     return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
 }
-
 
 export default CircularView;

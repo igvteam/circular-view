@@ -1,9 +1,15 @@
 {
   "name": "circular-view",
   "version": "0.1.1",
+  "description": "JBrowse genomic circular view component ",
   "files": [
+    "dist/**",
     "js/**"
   ],
+  "scripts": {
+    "build": "node scripts/generateEmbedCss.js && npx rollup --config",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/igvteam/circular-view.git"
@@ -12,5 +18,9 @@
     "igv"
   ],
   "author": "Jim Robinson <jrobinso@ucsd.edu>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^2.60.0",
+    "vanilla-picker": "^2.12.1"
+  }
 }

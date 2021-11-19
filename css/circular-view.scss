@@ -1,0 +1,139 @@
+$jbrowse-font-face: 'Open Sans', sans-serif;
+$jbrowse-toolbar-height: 32px;
+
+.jbrowse-container {
+
+  z-index: 2048;
+  position: absolute;
+
+  box-sizing: content-box;
+
+  border-color: dimgray;
+  border-style: solid;
+  border-width: thin;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  width: fit-content;
+  height: fit-content;
+
+  color: dimgray;
+  font-family: $jbrowse-font-face;
+  font-size: 12px;
+  //font-weight: 700;
+
+  background-color: white;
+}
+
+.jbrowse-toolbar {
+
+  position: relative;
+  width: 100%;
+  height: $jbrowse-toolbar-height;
+
+  background-color: lightgrey;
+
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
+  border-bottom-width: thin;
+
+  display: flex;
+  flex-flow: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.jbrowse-circular-genome-view {
+}
+
+.jbrowse-toolbar-button-container {
+
+  height: 100%;
+  width: fit-content;
+
+  display: flex;
+  flex-flow: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  button {
+    cursor: pointer;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+}
+
+.jbrowse-track-panel {
+
+  z-index: 1024;
+  position: absolute;
+
+  // need to account for toolbar bottom border width
+  top: $jbrowse-toolbar-height + 1px;
+  left:0;
+
+  width: 100%;
+  height: fit-content;
+
+  border-bottom-style: solid;
+  border-bottom-color: dimgray;
+  border-bottom-width: thin;
+
+  display: flex;
+  flex-flow: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  // track tools
+  >div {
+    width: 100%;
+    height: fit-content;
+
+    background-color: white;
+
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+
+    // Hide/Show | Set Color & Alpha
+    >button {
+      cursor: pointer;
+      margin: 8px;
+    }
+
+    // track name
+    >div {
+
+      font-weight: 700;
+
+      margin-left: 4px;
+      vertical-align: middle;
+
+      padding-left: 4px;
+      padding-right: 4px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      height: fit-content;
+      width: 160px;
+    }
+  }
+
+  >div:hover {
+    background-color: #f4f4f4;
+  }
+
+}
