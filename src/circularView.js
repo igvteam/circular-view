@@ -19,7 +19,10 @@ class CircularView {
      *   }
      */
     constructor(parent, config) {
+
         config = config || {}
+        this.config = config;
+
         if (CircularView.isInstalled()) {
 
             this.parent = parent
