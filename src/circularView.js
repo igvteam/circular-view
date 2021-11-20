@@ -38,14 +38,15 @@ class CircularView {
             wrapper.appendChild(element)
             this.container = element
 
-
-            this.config = config
-
             if (config.assembly) {
                 this.setAssembly(config.assembly)
             }
 
-            this.tracks = []
+            this.tracks = config.tracks || [];
+
+            this.width = config.width || 500;
+            this.height = config.height || 500;
+            this.setSize(this.width, this.height);
 
         } else {
             console.error("JBrowse circular view is not installed")
@@ -116,13 +117,15 @@ class CircularView {
         this.toolbar.appendChild(buttonContainer)
 
         // Close Window
-        button = document.createElement('div')
-        button.className = 'igv-circview-button'
-        buttonContainer.appendChild(button)
-        button.innerText = 'Close'
-        button.addEventListener('click', () => {
-            this.visible = false
-        })
+        if(false !== this.config.showCloseButton) {
+            button = document.createElement('div')
+            button.className = 'igv-circview-button'
+            buttonContainer.appendChild(button)
+            button.innerText = 'Close'
+            button.addEventListener('click', () => {
+                this.visible = false
+            })
+        }
 
     }
 
@@ -153,7 +156,7 @@ class CircularView {
         // track color
         const pickerButton = document.createElement('button')
         pickerButton.className = 'igv-circview-button'
-        pickerButton.innerText = 'Color & Transparency'
+        pickerButton.innerText = 'Color'
         trackPanelRow.appendChild(pickerButton)
 
         const pickerConfig =
@@ -288,22 +291,22 @@ class CircularView {
     /**
      * Set the nominal size of the view in pixels.  Size is reduced some aribtrary amount to account for borders and margins
      */
-    setSize(size) {
+    setSize(width, height) {
 
-        this.container.style.width = `${size}px`
-        this.container.style.height = `${size}px`
+        height = height || width;
 
+        this.width = width;
+        this.height = height;
         if (this.viewState) {
-            size -= 45
             const view = this.viewState.session.view
-            view.setWidth(size)
-            view.setHeight(size /* this is the height of the area inside the border in pixels */)
+            view.setWidth(width)
+            view.setHeight(height /* this is the height of the area inside the border in pixels */)
             view.setBpPerPx(view.minBpPerPx)
         }
     }
 
     getSize() {
-        return this.container.clientWidth
+        return Math.min(this.width, this.height)
     }
 
     clearChords() {
@@ -448,7 +451,7 @@ class CircularView {
         }
 
         this.element = React.createElement(JBrowseCircularGenomeView, {viewState: this.viewState})
-        this.setSize(this.container.clientWidth)
+        this.setSize(this.width, this.height)
 
         ReactDOM.render(this.element, this.container)
 

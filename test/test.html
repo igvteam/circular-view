@@ -39,6 +39,8 @@
 
     const config =
         {
+            width: 700,
+            height: 700,
             assembly: hg19,
             onChordClick: (feature) => {
                 const f1 = feature.data;
@@ -54,8 +56,6 @@
         }
 
     const circularView = new CircularView(document.querySelector('#igv-app-container'), config);
-
-    circularView.setSize(768)
 
     document.getElementById("hg19").addEventListener("click", e => circularView.setAssembly(hg19));
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
