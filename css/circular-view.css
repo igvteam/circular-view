@@ -1,6 +1,6 @@
 .igv-circview-container {
   z-index: 2048;
-  position: absolute;
+  position: relative;
   box-sizing: content-box;
   border-color: dimgray;
   border-style: solid;
@@ -60,8 +60,6 @@
   justify-content: flex-start;
   align-items: center; }
   .igv-circview-track-panel > div {
-    padding-top: 5px;
-    padding-bottom: 5px;
     width: 100%;
     height: fit-content;
     background-color: white;
@@ -81,32 +79,27 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      height: fit-content;
-   }
+      height: fit-content; }
   .igv-circview-track-panel > div:hover {
     background-color: #f4f4f4; }
-
-.igv-circview-button {
-  display:inline-block;
-  color:#444;
-  border:1px solid #8d8b8b;
-  border-radius: 4px;
-  background: rgb(239,239,239);
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
-  cursor:pointer;
-  vertical-align:middle;
-  padding: 5px;
-  text-align: center;
-  font-family: "Open Sans", sans-serif;
-  font-size: 12px;
-}
-.igv-circview-button:hover {
-  background: rgb(239,239,239);
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
-}
-.igv-circview-button:active {
-  color: #007bff;
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
-}
+  .igv-circview-track-panel .igv-circview-button {
+    display: inline-block;
+    color: #444;
+    border: 1px solid #8d8b8b;
+    border-radius: 4px;
+    background: #efefef;
+    box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    vertical-align: middle;
+    padding: 5px;
+    text-align: center;
+    font-family: "Open Sans", sans-serif;
+    font-size: 12px; }
+  .igv-circview-track-panel .igv-circview-button:hover {
+    background: #efefef;
+    box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6); }
+  .igv-circview-track-panel .igv-circview-button:active {
+    color: #007bff;
+    box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6); }
 
 /*# sourceMappingURL=circular-view.css.map */
