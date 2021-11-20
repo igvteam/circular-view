@@ -24,16 +24,18 @@ class CircularView {
 
             this.parent = parent
 
+            // wrapper for toolbar and circular-view container
+            const wrapper = document.createElement('div')
+            wrapper.className = 'igv-circview-container'
+            parent.appendChild(wrapper)
+
             // toolbar
-            this.createToolbarAndTrackPanel(parent)
-
-
-            let element
+            this.createToolbarAndTrackPanel(wrapper)
 
             // circular view container
-            element = document.createElement('div')
+            const element = document.createElement('div')
             element.className = 'igv-circview-circular-genome-view'
-            parent.appendChild(element)
+            wrapper.appendChild(element)
             this.container = element
 
 

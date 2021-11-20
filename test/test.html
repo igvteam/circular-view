@@ -26,7 +26,7 @@
     <button id="dellyLoad">Load</button>
 </p>
 
-<div class='igv-circview-container'></div>
+<div id='igv-app-container'></div>
 
 <script type="module">
 
@@ -53,7 +53,7 @@
             }
         }
 
-    const circularView = new CircularView(document.querySelector('.igv-circview-container'), config);
+    const circularView = new CircularView(document.querySelector('#igv-app-container'), config);
 
     circularView.setSize(768)
 
