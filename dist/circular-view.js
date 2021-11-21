@@ -1392,6 +1392,7 @@ class CircularView {
 
     clearChords() {
         this.tracks = [];
+        this.trackPanel.innerHTML = '';
         this.render();
     }
 
@@ -1459,6 +1460,7 @@ class CircularView {
         }
     }
 
+    // TODO -- remove corresponding row from track panel
     deleteTrack(trackID) {
         let idx = this.tracks.findIndex(t => trackID === t.id);
         if (idx >= 0) {
