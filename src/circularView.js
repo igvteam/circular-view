@@ -134,11 +134,12 @@ class CircularView {
 
     addToTrackPanel(track) {
 
+        // single track row - container for hide-button | color-picker-swatch | track-name
         const trackPanelRow = document.createElement('div')
         this.trackPanel.appendChild(trackPanelRow)
 
-        let element
 
+        let element
 
         // track hide|show
         element = document.createElement('div')
@@ -158,9 +159,10 @@ class CircularView {
 
         // track color
         const pickerButton = document.createElement('div')
-        pickerButton.className = 'igv-circview-button'
-        pickerButton.innerText = 'Color'
+        pickerButton.className = 'igv-circview-swatch-button'
+        // pickerButton.innerText = 'Color'
         trackPanelRow.appendChild(pickerButton)
+        pickerButton.style.backgroundColor = track.color
 
         const pickerConfig =
             {
@@ -169,6 +171,7 @@ class CircularView {
                 editorFormat: 'rgb',
                 color: track.color,
                 onChange: ({rgbaString}) => {
+                    pickerButton.style.backgroundColor = rgbaString
                     this.setTrackColor(track.id, rgbaString)
                 }
             }

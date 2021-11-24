@@ -39,6 +39,8 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center; }
+  .igv-circview-toolbar-button-container > div {
+    margin: 4px; }
 
 .igv-circview-track-panel {
   z-index: 1024;
@@ -50,25 +52,28 @@
   border-bottom-style: solid;
   border-bottom-color: dimgray;
   border-bottom-width: thin;
+  background-color: white;
   display: flex;
   flex-flow: column;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  align-items: center; }
+  align-items: flex-start; }
   .igv-circview-track-panel > div {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    width: 100%;
-    height: fit-content;
-    background-color: white;
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center; }
     .igv-circview-track-panel > div > div {
-      margin-left: 4px;
-      margin-right: 4px; }
+      margin: 4px; }
+
+.igv-circview-swatch-button {
+  cursor: pointer;
+  padding: 5px;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #8d8b8b;
+  border-radius: 16px; }
 
 .igv-circview-button {
   cursor: pointer;
