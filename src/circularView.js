@@ -162,7 +162,7 @@ class CircularView {
         pickerButton.className = 'igv-circview-swatch-button'
         // pickerButton.innerText = 'Color'
         trackPanelRow.appendChild(pickerButton)
-        pickerButton.style.backgroundColor = track.color
+        pickerButton.style.backgroundColor = setAlpha(track.color, 1)
 
         const pickerConfig =
             {
@@ -171,7 +171,7 @@ class CircularView {
                 editorFormat: 'rgb',
                 color: track.color,
                 onChange: ({rgbaString}) => {
-                    pickerButton.style.backgroundColor = rgbaString
+                    pickerButton.style.backgroundColor = setAlpha(rgbaString, 1)
                     this.setTrackColor(track.id, rgbaString)
                 }
             }
@@ -473,6 +473,11 @@ class CircularView {
             }
         }
     }
+}
+
+function setAlpha(rgba, alpha) {
+    const [a, b, c, ignore] = rgba.split(',') // rgba(r g b alpha)
+    return `${ a },${ b },${ c },${ alpha })`
 }
 
 function shortChrName(chrName) {
