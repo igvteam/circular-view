@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 const cssPath = require.resolve('../css/circular-view.css')
+// const cssPath = require.resolve('../css/circular-view-jr.css')
 let ping = fs.readFileSync(cssPath, 'utf-8');
 ping = ping.replace(/\r\n/g, '\\n');
 ping = ping.replace(/\n/g, '\\n');
