@@ -1,6 +1,5 @@
 import Picker from '../node_modules/vanilla-picker/dist/vanilla-picker.mjs'
 import {getChrColor} from "./chrColor.js"
-import IGVColor from "./igv-color.js"
 
 class CircularView {
 

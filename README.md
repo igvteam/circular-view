@@ -59,6 +59,7 @@ IGV use cases, for general see the JBrowse project:
        }
      ```
   
+* clearChords() -- Clear all chords and delete associated tracks
   
 * hideTrack( id )  -- Hide the specified track
 
