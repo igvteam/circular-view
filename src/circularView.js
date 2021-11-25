@@ -134,11 +134,12 @@ class CircularView {
 
     addToTrackPanel(track) {
 
+        // single track row - container for hide-button | color-picker-swatch | track-name
         const trackPanelRow = document.createElement('div')
         this.trackPanel.appendChild(trackPanelRow)
 
-        let element
 
+        let element
 
         // track hide|show
         element = document.createElement('div')
@@ -157,10 +158,11 @@ class CircularView {
         })
 
         // track color
-        const pickerButton = document.createElement('button')
-        pickerButton.className = 'igv-circview-button'
-        pickerButton.innerText = 'Color'
+        const pickerButton = document.createElement('div')
+        pickerButton.className = 'igv-circview-swatch-button'
+        // pickerButton.innerText = 'Color'
         trackPanelRow.appendChild(pickerButton)
+        pickerButton.style.backgroundColor = setAlpha(track.color, 1)
 
         const pickerConfig =
             {
@@ -169,6 +171,7 @@ class CircularView {
                 editorFormat: 'rgb',
                 color: track.color,
                 onChange: ({rgbaString}) => {
+                    pickerButton.style.backgroundColor = setAlpha(rgbaString, 1)
                     this.setTrackColor(track.id, rgbaString)
                 }
             }
@@ -470,6 +473,11 @@ class CircularView {
             }
         }
     }
+}
+
+function setAlpha(rgba, alpha) {
+    const [a, b, c, ignore] = rgba.split(',') // rgba(r g b alpha)
+    return `${ a },${ b },${ c },${ alpha })`
 }
 
 function shortChrName(chrName) {
