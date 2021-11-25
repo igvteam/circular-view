@@ -1236,12 +1236,12 @@ class CircularView {
         });
 
         // track color
+        element.clientHeight;
         const pickerButton = document.createElement('div');
-        pickerButton.className = 'igv-circview-swatch-button';
-        // pickerButton.innerText = 'Color'
+        pickerButton.className = 'igv-circview-button';
+        pickerButton.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';   // <- important for button to size properly
         trackPanelRow.appendChild(pickerButton);
         pickerButton.style.backgroundColor = setAlpha(track.color, 1);
-
         const pickerConfig =
             {
                 parent: pickerButton,
@@ -1258,6 +1258,7 @@ class CircularView {
 
         // track name
         element = document.createElement('div');
+        element.style.color = 'black';
         trackPanelRow.appendChild(element);
         element.innerText = element.title = track.name;
 
