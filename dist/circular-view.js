@@ -1080,6 +1080,8 @@ const chrColorMap = {
     "chr48": "rgb(20, 255, 177)",
 };
 
+const EXP5 = Math.exp(5);
+
 class CircularView {
 
     static isInstalled() {
@@ -1172,10 +1174,10 @@ class CircularView {
 
                 if ('none' === this.trackPanel.style.display) {
                     this.trackPanel.style.display = 'flex';
-                    event.target.innerText = 'Hide Track Options';
+                    event.target.innerText = 'Hide Track Controls';
                 } else {
                     this.trackPanel.style.display = 'none';
-                    event.target.innerText = 'Show Track Options';
+                    event.target.innerText = 'Show Track Controls';
                 }
 
             }
@@ -1198,7 +1200,7 @@ class CircularView {
         this.toolbar.appendChild(buttonContainer);
 
         // Close Window
-        if(false !== this.config.showCloseButton) {
+        if (false !== this.config.showCloseButton) {
             button = document.createElement('div');
             button.className = 'igv-circview-button';
             buttonContainer.appendChild(button);
@@ -1232,11 +1234,14 @@ class CircularView {
                 this.showTrack(track.id);
                 event.target.innerText = "Hide";
             }
-
         });
 
+        // The alpha range slider.  Create this here so we can reference it from the color picker
+        const alphaSlider = document.createElement('input');
+        const valueToAlpha = (value) => Math.exp(value / 200) / EXP5;
+        const alphaToValue = (alpha) => 200 * Math.log(alpha  * EXP5);
+
         // track color
-        element.clientHeight;
         const pickerButton = document.createElement('div');
         pickerButton.className = 'igv-circview-button';
         pickerButton.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';   // <- important for button to size properly
@@ -1251,10 +1256,27 @@ class CircularView {
                 onChange: ({rgbaString}) => {
                     pickerButton.style.backgroundColor = setAlpha(rgbaString, 1);
                     this.setTrackColor(track.id, rgbaString);
+                    alphaSlider.value = alphaToValue(getAlpha(track.color));
                 }
             };
+        const picker = new Picker(pickerConfig);
 
-        new Picker(pickerConfig);
+        // alpha transparency
+        alphaSlider.setAttribute('title', 'Adjust transparency of arcs');
+        alphaSlider.type = 'range';
+        //alphaSlider.className = 'igv-circview-alpha-slider'
+        alphaSlider.style.width= '100px';
+        alphaSlider.style.marginRight='10px';
+        alphaSlider.setAttribute('class', 'range');
+        alphaSlider.setAttribute('min', '0');
+        alphaSlider.setAttribute('max', '1000');
+        alphaSlider.value = alphaToValue(getAlpha(track.color));
+        alphaSlider.oninput = () => {
+            const v = valueToAlpha(alphaSlider.value);
+            this.setTrackColor(track.id, setAlpha(track.color, v));
+            picker.setColor(track.color);
+        };
+        trackPanelRow.appendChild(alphaSlider);
 
         // track name
         element = document.createElement('div');
@@ -1556,7 +1578,15 @@ class CircularView {
 
 function setAlpha(rgba, alpha) {
     const [a, b, c, ignore] = rgba.split(','); // rgba(r g b alpha)
-    return `${ a },${ b },${ c },${ alpha })`
+    return `${a},${b},${c},${alpha})`
+}
+
+function getAlpha(rgba) {
+    if (rgba.startsWith("rgba(")) {
+        return Number(rgba.split(',')[3].replace(')', ''))
+    } else {
+        return 1
+    }
 }
 
 function shortChrName(chrName) {
@@ -1569,7 +1599,7 @@ function guid() {
 
 function embedCSS() {
 
-    const css =  '.igv-circview-container {\n  z-index: 2048;\n  position: absolute;\n  width: fit-content;\n  height: fit-content;\n  box-sizing: content-box;\n  color: dimgray;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  background-color: white;\n  border-color: dimgray;\n  border-style: solid;\n  border-width: thin;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start; }\n\n.igv-circview-toolbar {\n  position: relative;\n  width: 100%;\n  height: 32px;\n  background-color: lightgrey;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: space-between;\n  align-items: center; }\n\n.igv-circview-toolbar-button-container {\n  height: 100%;\n  width: fit-content;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center; }\n  .igv-circview-toolbar-button-container > div {\n    margin: 4px; }\n\n.igv-circview-track-panel {\n  z-index: 1024;\n  position: absolute;\n  top: 33px;\n  left: 0;\n  width: 100%;\n  height: fit-content;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  background-color: white;\n  display: flex;\n  flex-flow: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start; }\n  .igv-circview-track-panel > div {\n    display: flex;\n    flex-flow: row;\n    flex-wrap: nowrap;\n    justify-content: flex-start;\n    align-items: center; }\n    .igv-circview-track-panel > div > div {\n      margin: 4px; }\n\n.igv-circview-swatch-button {\n  cursor: pointer;\n  padding: 5px;\n  width: 8px;\n  height: 8px;\n  border: 1px solid #8d8b8b;\n  border-radius: 16px; }\n\n.igv-circview-button {\n  cursor: pointer;\n  padding: 5px;\n  color: #444;\n  vertical-align: middle;\n  text-align: center;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  border: 1px solid #8d8b8b;\n  border-radius: 4px;\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2); }\n\n.igv-circview-button:hover {\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6); }\n\n.igv-circview-button:active {\n  color: #007bff;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6); }\n\n/*# sourceMappingURL=circular-view.css.map */\n';
+    const css =  '.igv-circview-container {\n  z-index: 2048;\n  position: absolute;\n  width: fit-content;\n  height: fit-content;\n  box-sizing: content-box;\n  color: dimgray;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  background-color: white;\n  border-color: dimgray;\n  border-style: solid;\n  border-width: thin;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n\n.igv-circview-toolbar {\n  position: relative;\n  width: 100%;\n  height: 32px;\n  background-color: lightgrey;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.igv-circview-toolbar-button-container {\n  height: 100%;\n  width: fit-content;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-toolbar-button-container > div {\n  margin: 4px;\n}\n\n.igv-circview-track-panel {\n  z-index: 1024;\n  position: absolute;\n  top: 33px;\n  left: 0;\n  width: 100%;\n  height: fit-content;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  background-color: white;\n  display: flex;\n  flex-flow: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n.igv-circview-track-panel > div {\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-track-panel > div > div {\n  margin: 4px;\n}\n\n.igv-circview-swatch-button {\n  cursor: pointer;\n  padding: 5px;\n  width: 8px;\n  height: 8px;\n  border: 1px solid #8d8b8b;\n  border-radius: 16px;\n}\n\n.igv-circview-button {\n  cursor: pointer;\n  padding: 5px;\n  color: #444;\n  vertical-align: middle;\n  text-align: center;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  border: 1px solid #8d8b8b;\n  border-radius: 4px;\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);\n}\n\n.igv-circview-button:hover {\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n.igv-circview-button:active {\n  color: #007bff;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n/*# sourceMappingURL=circular-view.css.map */\n';
 
     const style = document.createElement('style');
     style.setAttribute('type', 'text/css');

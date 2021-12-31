@@ -1,6 +1,8 @@
 import Picker from '../node_modules/vanilla-picker/dist/vanilla-picker.mjs'
 import {getChrColor} from "./chrColor.js"
 
+const EXP5 = Math.exp(5)
+
 class CircularView {
 
     static isInstalled() {
@@ -20,7 +22,7 @@ class CircularView {
     constructor(parent, config) {
 
         config = config || {}
-        this.config = config;
+        this.config = config
 
         if (CircularView.isInstalled()) {
 
@@ -44,11 +46,11 @@ class CircularView {
                 this.setAssembly(config.assembly)
             }
 
-            this.tracks = config.tracks || [];
+            this.tracks = config.tracks || []
 
-            this.width = config.width || 500;
-            this.height = config.height || 500;
-            this.setSize(this.width, this.height);
+            this.width = config.width || 500
+            this.height = config.height || 500
+            this.setSize(this.width, this.height)
 
         } else {
             console.error("JBrowse circular view is not installed")
@@ -93,10 +95,10 @@ class CircularView {
 
                 if ('none' === this.trackPanel.style.display) {
                     this.trackPanel.style.display = 'flex'
-                    event.target.innerText = 'Hide Track Options'
+                    event.target.innerText = 'Hide Track Controls'
                 } else {
                     this.trackPanel.style.display = 'none'
-                    event.target.innerText = 'Show Track Options'
+                    event.target.innerText = 'Show Track Controls'
                 }
 
             }
@@ -119,7 +121,7 @@ class CircularView {
         this.toolbar.appendChild(buttonContainer)
 
         // Close Window
-        if(false !== this.config.showCloseButton) {
+        if (false !== this.config.showCloseButton) {
             button = document.createElement('div')
             button.className = 'igv-circview-button'
             buttonContainer.appendChild(button)
@@ -153,11 +155,14 @@ class CircularView {
                 this.showTrack(track.id)
                 event.target.innerText = "Hide"
             }
-
         })
 
+        // The alpha range slider.  Create this here so we can reference it from the color picker
+        const alphaSlider = document.createElement('input')
+        const valueToAlpha = (value) => Math.exp(value / 200) / EXP5
+        const alphaToValue = (alpha) => 200 * Math.log(alpha  * EXP5)
+
         // track color
-        const dim = element.clientHeight;
         const pickerButton = document.createElement('div')
         pickerButton.className = 'igv-circview-button'
         pickerButton.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;'   // <- important for button to size properly
@@ -172,10 +177,27 @@ class CircularView {
                 onChange: ({rgbaString}) => {
                     pickerButton.style.backgroundColor = setAlpha(rgbaString, 1)
                     this.setTrackColor(track.id, rgbaString)
+                    alphaSlider.value = alphaToValue(getAlpha(track.color))
                 }
             }
+        const picker = new Picker(pickerConfig)
 
-        new Picker(pickerConfig)
+        // alpha transparency
+        alphaSlider.setAttribute('title', 'Adjust transparency of arcs')
+        alphaSlider.type = 'range'
+        //alphaSlider.className = 'igv-circview-alpha-slider'
+        alphaSlider.style.width= '100px'
+        alphaSlider.style.marginRight='10px'
+        alphaSlider.setAttribute('class', 'range')
+        alphaSlider.setAttribute('min', '0')
+        alphaSlider.setAttribute('max', '1000')
+        alphaSlider.value = alphaToValue(getAlpha(track.color))
+        alphaSlider.oninput = () => {
+            const v = valueToAlpha(alphaSlider.value)
+            this.setTrackColor(track.id, setAlpha(track.color, v))
+            picker.setColor(track.color)
+        }
+        trackPanelRow.appendChild(alphaSlider)
 
         // track name
         element = document.createElement('div')
@@ -299,10 +321,10 @@ class CircularView {
      */
     setSize(width, height) {
 
-        height = height || width;
+        height = height || width
 
-        this.width = width;
-        this.height = height;
+        this.width = width
+        this.height = height
         if (this.viewState) {
             const view = this.viewState.session.view
             view.setWidth(width)
@@ -477,7 +499,15 @@ class CircularView {
 
 function setAlpha(rgba, alpha) {
     const [a, b, c, ignore] = rgba.split(',') // rgba(r g b alpha)
-    return `${ a },${ b },${ c },${ alpha })`
+    return `${a},${b},${c},${alpha})`
+}
+
+function getAlpha(rgba) {
+    if (rgba.startsWith("rgba(")) {
+        return Number(rgba.split(',')[3].replace(')', ''))
+    } else {
+        return 1
+    }
 }
 
 function shortChrName(chrName) {
