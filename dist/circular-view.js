@@ -1165,7 +1165,7 @@ class CircularView {
         this.trackPanelPresentationButton = document.createElement('div');
         this.trackPanelPresentationButton.className = 'igv-circview-button';
         buttonContainer.appendChild(this.trackPanelPresentationButton);
-        this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Options' : 'Hide Track Options';
+        this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Controls' : 'Hide Track Controls';
         this.trackPanelPresentationButton.addEventListener('click', (event) => {
 
             const trackPanelRows = this.trackPanel.querySelectorAll('div');
