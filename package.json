@@ -3,9 +3,7 @@
   "version": "0.1.1",
   "description": "JBrowse genomic circular view component ",
   "files": [
-    "dist/**",
-    "src/**",
-    "css/**"
+    "dist/**"
   ],
   "scripts": {
     "build": "node scripts/generateEmbedCss.js && npx rollup --config",
