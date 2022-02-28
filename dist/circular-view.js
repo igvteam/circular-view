@@ -1080,6 +1080,73 @@ const chrColorMap = {
     "chr48": "rgb(20, 255, 177)",
 };
 
+class ChordSetManager {
+
+    constructor(config) {
+        this.tracks = [];
+        this.chordSets = [];
+    }
+
+    addChordSet(chordSet) {
+
+        // If a chord set with this name exists replace it (same track, same region)
+        this.chordSets = this.chordSets.filter(g => g.name !== chordSet.name);
+        this.chordSets.push(chordSet);
+
+        let track = this.tracks.find(t => chordSet.trackName === t.name);
+        if (track) {
+            track.chordSets = track.chordSets.filter(cs => cs.name !== chordSet.name);
+            track.chordSets.push(chordSet);
+        }
+        if (!track) {
+            track = new IGVTrack(chordSet);
+            this.tracks.push(track);
+        }
+    }
+
+    clearChords() {
+        this.tracks = [];
+        this.chordSets = [];
+    }
+
+    getTrack(name) {
+        return this.tracks.find(t => name === t.name)
+    }
+
+    getChordset(name) {
+        return this.chordSets.find(cs => name === cs.name)
+    }
+
+}
+
+class IGVTrack {
+    constructor(chordSet) {
+        this.name = chordSet.trackName;
+        this.color = chordSet.trackColor;
+        this.visible = true;
+        this.chordSets = [chordSet];
+        this.id = guid$1();
+    }
+
+    get chords() {
+        if (this.chordSets.length === 1) {
+            return this.chordSets[0].chords
+        }
+        const chords = [];
+        for (let cs of this.chordSets) {
+            for (let c of cs.chords) {
+                chords.push(c);
+            }
+        }
+        return chords
+    }
+}
+
+
+function guid$1() {
+    return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4)
+}
+
 const EXP5 = Math.exp(5);
 
 class CircularView {
@@ -1106,6 +1173,8 @@ class CircularView {
         if (CircularView.isInstalled()) {
 
             this.parent = parent;
+            this.groupByTrack = config.groupByTrack === true;
+            this.chordManager = new ChordSetManager(config);
 
             // wrapper for toolbar and circular-view container
             const wrapper = document.createElement('div');
@@ -1113,7 +1182,8 @@ class CircularView {
             parent.appendChild(wrapper);
 
             // toolbar
-            this.createToolbarAndTrackPanel(wrapper);
+            this.createControls(wrapper);
+            this.resetControlPanel();
 
             // circular view container
             const element = document.createElement('div');
@@ -1125,8 +1195,6 @@ class CircularView {
                 this.setAssembly(config.assembly);
             }
 
-            this.tracks = config.tracks || [];
-
             this.width = config.width || 500;
             this.height = config.height || 500;
             this.setSize(this.width, this.height);
@@ -1136,55 +1204,47 @@ class CircularView {
         }
     }
 
-    createToolbarAndTrackPanel(parent) {
-
-        let element;
+    createControls(parent) {
 
         // toolbar
-        element = document.createElement('div');
-        element.className = 'igv-circview-toolbar';
-        parent.appendChild(element);
-        this.toolbar = element;
+        const toolbarDiv = document.createElement('div');
+        toolbarDiv.className = 'igv-circview-toolbar';
+        parent.appendChild(toolbarDiv);
+        this.toolbar = toolbarDiv;
 
-
-        // track panel
-        element = document.createElement('div');
-        element.className = 'igv-circview-track-panel';
-        parent.appendChild(element);
-        this.trackPanel = element;
-
-        this.trackPanel.style.display = 'none';
+        // control panel
+        const controlPanelDiv = document.createElement('div');
+        controlPanelDiv.className = 'igv-circview-track-panel';
+        parent.appendChild(controlPanelDiv);
+        this.controlPanel = controlPanelDiv;
+        this.controlPanel.style.display = 'none';
 
 
         // toolbar button container - Track Options - Clear All
-        let buttonContainer = document.createElement('div');
+        const buttonContainer = document.createElement('div');
         buttonContainer.className = 'igv-circview-toolbar-button-container';
         this.toolbar.appendChild(buttonContainer);
 
-        // Track Options
-        this.trackPanelPresentationButton = document.createElement('div');
-        this.trackPanelPresentationButton.className = 'igv-circview-button';
-        buttonContainer.appendChild(this.trackPanelPresentationButton);
-        this.trackPanelPresentationButton.innerText = 'none' === this.trackPanel.style.display ? 'Show Track Controls' : 'Hide Track Controls';
-        this.trackPanelPresentationButton.addEventListener('click', (event) => {
-
-            const trackPanelRows = this.trackPanel.querySelectorAll('div');
-
+        // Show Controls
+        this.showControlsButton = document.createElement('div');
+        this.showControlsButton.className = 'igv-circview-button';
+        buttonContainer.appendChild(this.showControlsButton);
+        this.showControlsButton.innerText = 'none' === this.controlPanel.style.display ? 'Show Controls' : 'Hide Controls';
+        this.showControlsButton.addEventListener('click', (event) => {
+            const trackPanelRows = this.controlPanel.querySelectorAll('div');
             if (trackPanelRows.length > 0) {
 
-                if ('none' === this.trackPanel.style.display) {
-                    this.trackPanel.style.display = 'flex';
-                    event.target.innerText = 'Hide Track Controls';
+                if ('none' === this.controlPanel.style.display) {
+                    this.controlPanel.style.display = 'flex';
+                    event.target.innerText = 'Hide Controls';
                 } else {
-                    this.trackPanel.style.display = 'none';
-                    event.target.innerText = 'Show Track Controls';
+                    this.controlPanel.style.display = 'none';
+                    event.target.innerText = 'Show Controls';
                 }
-
             }
-
         });
 
-        // Clear All Chords
+        // Clear All
         let button = document.createElement('div');
         button.className = 'igv-circview-button';
         buttonContainer.appendChild(button);
@@ -1193,13 +1253,7 @@ class CircularView {
             this.clearChords();
         });
 
-
-        // toolbar button container - Close Window
-        buttonContainer = document.createElement('div');
-        buttonContainer.className = 'igv-circview-toolbar-button-container';
-        this.toolbar.appendChild(buttonContainer);
-
-        // Close Window
+        // Close
         if (false !== this.config.showCloseButton) {
             button = document.createElement('div');
             button.className = 'igv-circview-button';
@@ -1209,29 +1263,64 @@ class CircularView {
                 this.visible = false;
             });
         }
-
     }
 
-    addToTrackPanel(track) {
+    resetControlPanel() {
+        this.controlPanel.innerHTML = '';
+        this.controlPanel.appendChild(this.createGroupByCB());
+        const chordSets = this.groupByTrack ? this.chordManager.tracks : this.chordManager.chordSets;
+        for(let cs of chordSets) {
+            this.addToControlPanel(cs);
+        }
+    }
+
+    createGroupByCB() {
+        const groupByCB = document.createElement('input');
+        groupByCB.type = 'checkbox';
+        groupByCB.id = 'groupByCB';
+        groupByCB.style.width = '1.4em';
+        groupByCB.style.height = '1.4em';
+        groupByCB.checked = this.groupByTrack;
+
+        groupByCB.onclick = (evt) => {
+            this.groupByTrack = evt.target.checked;
+            this.resetControlPanel();
+            this.render();
+        };
+
+        const groupByLabel = document.createElement('label');
+        groupByLabel.for = 'groupByCB';
+        groupByLabel.innerText = 'Group by track';
+        groupByLabel.style.color = 'black';
+        groupByLabel.style.paddingLeft = '10px';
+        const trackPanelRow = document.createElement('div');
+        trackPanelRow.style.width = '100%';
+        trackPanelRow.style.paddingTop = '5px';
+        trackPanelRow.style.paddingBottom = '5px';
+        trackPanelRow.style.background = 'rgb(216, 230, 234)';
+        trackPanelRow.appendChild(groupByCB);
+        trackPanelRow.appendChild(groupByLabel);
+        return trackPanelRow
+    }
+
+    addToControlPanel(chordSet) {
 
         // single track row - container for hide-button | color-picker-swatch | track-name
-        const trackPanelRow = document.createElement('div');
-        this.trackPanel.appendChild(trackPanelRow);
+        const row = document.createElement('div');
+        this.controlPanel.appendChild(row);
 
-
-        let element;
 
         // track hide|show
-        element = document.createElement('div');
-        element.className = 'igv-circview-button';
-        trackPanelRow.appendChild(element);
-        element.innerText = true === track.visible ? 'Hide' : 'Show';
-        element.addEventListener('click', event => {
-            if (true === track.visible) {
-                this.hideTrack(track.id);
+        const hideShowButton = document.createElement('div');
+        hideShowButton.className = 'igv-circview-button';
+        row.appendChild(hideShowButton);
+        hideShowButton.innerText = true === chordSet.visible ? 'Hide' : 'Show';
+        hideShowButton.addEventListener('click', event => {
+            if (true === chordSet.visible) {
+                this.hideTrack(chordSet.name);
                 event.target.innerText = "Show";
             } else {
-                this.showTrack(track.id);
+                this.showTrack(chordSet.name);
                 event.target.innerText = "Hide";
             }
         });
@@ -1239,24 +1328,24 @@ class CircularView {
         // The alpha range slider.  Create this here so we can reference it from the color picker
         const alphaSlider = document.createElement('input');
         const valueToAlpha = (value) => Math.exp(value / 200) / EXP5;
-        const alphaToValue = (alpha) => 200 * Math.log(alpha  * EXP5);
+        const alphaToValue = (alpha) => 200 * Math.log(alpha * EXP5);
 
-        // track color
-        const pickerButton = document.createElement('div');
-        pickerButton.className = 'igv-circview-button';
-        pickerButton.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';   // <- important for button to size properly
-        trackPanelRow.appendChild(pickerButton);
-        pickerButton.style.backgroundColor = setAlpha(track.color, 1);
+        // color
+        const colorPickerButton = document.createElement('div');
+        colorPickerButton.className = 'igv-circview-button';
+        colorPickerButton.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;';   // <- important for button to size properly
+        row.appendChild(colorPickerButton);
+        colorPickerButton.style.backgroundColor = setAlpha(chordSet.color, 1);
         const pickerConfig =
             {
-                parent: pickerButton,
+                parent: colorPickerButton,
                 popup: 'right',
                 editorFormat: 'rgb',
-                color: track.color,
+                color: chordSet.color,
                 onChange: ({rgbaString}) => {
-                    pickerButton.style.backgroundColor = setAlpha(rgbaString, 1);
-                    this.setTrackColor(track.id, rgbaString);
-                    alphaSlider.value = alphaToValue(getAlpha(track.color));
+                    colorPickerButton.style.backgroundColor = setAlpha(rgbaString, 1);
+                    this.setTrackColor(chordSet.name, rgbaString);
+                    alphaSlider.value = alphaToValue(getAlpha(chordSet.color));
                 }
             };
         const picker = new Picker(pickerConfig);
@@ -1265,24 +1354,24 @@ class CircularView {
         alphaSlider.setAttribute('title', 'Adjust transparency of arcs');
         alphaSlider.type = 'range';
         //alphaSlider.className = 'igv-circview-alpha-slider'
-        alphaSlider.style.width= '100px';
-        alphaSlider.style.marginRight='10px';
+        alphaSlider.style.width = '100px';
+        alphaSlider.style.marginRight = '10px';
         alphaSlider.setAttribute('class', 'range');
         alphaSlider.setAttribute('min', '0');
         alphaSlider.setAttribute('max', '1000');
-        alphaSlider.value = alphaToValue(getAlpha(track.color));
+        alphaSlider.value = alphaToValue(getAlpha(chordSet.color));
         alphaSlider.oninput = () => {
             const v = valueToAlpha(alphaSlider.value);
-            this.setTrackColor(track.id, setAlpha(track.color, v));
-            picker.setColor(track.color);
+            this.setTrackColor(chordSet.name, setAlpha(chordSet.color, v));
+            picker.setColor(chordSet.color);
         };
-        trackPanelRow.appendChild(alphaSlider);
+        row.appendChild(alphaSlider);
 
         // track name
-        element = document.createElement('div');
-        element.style.color = 'black';
-        trackPanelRow.appendChild(element);
-        element.innerText = element.title = track.name;
+        const trackNameDive = document.createElement('div');
+        trackNameDive.style.color = 'black';
+        row.appendChild(trackNameDive);
+        trackNameDive.innerText = trackNameDive.title = chordSet.name;
 
     }
 
@@ -1296,7 +1385,7 @@ class CircularView {
         if (this.genomeId === igvGenome.id) {
             return
         }
-        this.tracks = [];
+        this.chordManager.clearChords();
         this.genomeId = igvGenome.id;
         this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)));
 
@@ -1359,39 +1448,24 @@ class CircularView {
 
     addChords(newChords, options = {}) {
 
-        const name = options.track || options.name || "*";
+        const tmp = options.track || options.name || "*";
+        const trackName = tmp.split(' ')[0].replaceAll("%20", " ");
+        const chordSetName = tmp.replaceAll("%20", " ");
 
-        let track = this.tracks.find(t => name === t.name);
+        const chordSet =  {
+            name: chordSetName,
+            trackName: trackName,
+            chords: newChords,
+            color: options.color || "black",
+            trackColor: options.trackColor || options.color || "black",
+            visible: true,
+            id: options.id || guid()
+        };
 
-        // Override track options or create new track
-        if (track) {
-            if (options.color) {
-                track.color = options.color;
-            }
-        } else {
-            track =
-                {
-                    name,
-                    chords: [],
-                    color: options.color || "black",
-                    visible: true,
-                    id: options.id || guid()
-                };
-            this.tracks.push(track);
+        this.chordManager.addChordSet(chordSet);
 
-            this.addToTrackPanel(track);
-        }
+        this.resetControlPanel();
 
-        // Append chords to track
-        const currentIDs = new Set(track.chords.map(c => c.uniqueId));
-        for (let c of newChords) {
-            if (!currentIDs.has(c.uniqueId) &&
-                this.chrNames.has(shortChrName(c.refName)) &&
-                this.chrNames.has(shortChrName(c.mate.refName))) {
-                track.chords.push(c);
-                currentIDs.add(c.uniqueId);
-            }
-        }
         this.render();
     }
 
@@ -1417,8 +1491,9 @@ class CircularView {
     }
 
     clearChords() {
-        this.tracks = [];
-        this.trackPanel.innerHTML = '';
+        //this.tracks = []
+        this.chordManager.clearChords();
+        this.resetControlPanel();
         this.render();
     }
 
@@ -1463,8 +1538,8 @@ class CircularView {
         this.parent.style.display = isVisible ? 'block' : 'none';
     }
 
-    hideTrack(trackID) {
-        let track = this.tracks.find(t => trackID === t.id);
+    hideTrack(trackName) {
+        let track = this.getTrack(trackName);
         if (track) {
             track.visible = false;
             this.render();
@@ -1473,34 +1548,44 @@ class CircularView {
         }
     }
 
-    showTrack(trackID) {
-        let idx = this.tracks.findIndex(t => trackID === t.id);
-        if (idx >= 0) {
-            const track = this.tracks[idx];
+    showTrack(trackName) {
+        let track = this.getTrack(trackName);
+        if (track) {
             track.visible = true;
-            this.tracks.splice(idx, 1);   // Change z-order
-            this.tracks.push(track);
             this.render();
         } else {
-            console.warn(`No track with name: ${name}`);
+            console.warn(`No track with name: ${trackName}`);
         }
     }
 
+    // showTrack(trackID) {
+    //     let idx = this.tracks.findIndex(t => trackID === t.id)
+    //     if (idx >= 0) {
+    //         const track = this.tracks[idx]
+    //         track.visible = true
+    //         this.tracks.splice(idx, 1)   // Change z-order
+    //         this.tracks.push(track)
+    //         this.render()
+    //     } else {
+    //         console.warn(`No track with name: ${name}`)
+    //     }
+    // }
+
     // TODO -- remove corresponding row from track panel
     deleteTrack(trackID) {
-        let idx = this.tracks.findIndex(t => trackID === t.id);
+        let idx = this.tracks.findIndex(t => trackID === t.name);
         if (idx >= 0) {
             this.tracks.splice(idx, 1);
         }
         this.render();
     }
 
-    getTrack(trackID) {
-        return this.tracks.find(t => trackID === t.id)
+    getTrack(name) {
+        return this.groupByTrack ? this.chordManager.getTrack(name) : this.chordManager.getChordset(name)
     }
 
-    setTrackColor(trackID, color) {
-        const t = this.getTrack(trackID);
+    setTrackColor(name, color) {
+        const t = this.getTrack(name);
         if (t) {
             t.color = color;
             const trackID = t.id;
@@ -1527,24 +1612,27 @@ class CircularView {
         // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
         ReactDOM.unmountComponentAtNode(this.container);
 
-        const visibleTracks = this.tracks.filter(t => false !== t.visible);
+
+
+        const visibleChordSets =
+            (this.groupByTrack ? this.chordManager.tracks : this.chordManager.chordSets).filter(t => t.visible);
 
         const jbrowseTracks = [];
         const colors = [];
 
-        for (let trackConfig of visibleTracks) {
+        for (let chordSet of visibleChordSets) {
+
             jbrowseTracks.push({
-                trackId: trackConfig.id,
-                name: trackConfig.name,
+                trackId: chordSet.id,
+                name: chordSet.name,
                 assemblyNames: ['forIGV'],
                 type: 'VariantTrack',
                 adapter: {
                     type: 'FromConfigAdapter',
-                    features: trackConfig.chords,
+                    features: chordSet.chords,
                 }
             });
-            colors.push(trackConfig.color);
-
+            colors.push(chordSet.color);
         }
 
         this.viewState = createViewState({
@@ -1553,7 +1641,7 @@ class CircularView {
         });
 
         // Set view colors
-        for (let i = 0; i < visibleTracks.length; i++) {
+        for (let i = 0; i < visibleChordSets.length; i++) {
             this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set(colors[i]);
             //this.viewState.config.tracks[i].displays[0].renderer.strokeColor.set("jexl:get(feature, 'color') || 'black'");
             //this.viewState.config.tracks[i].displays[0].renderer.strokeColorSelected.set("jexl:get(feature, 'highlightColor') || 'red'");
@@ -1564,10 +1652,11 @@ class CircularView {
 
         ReactDOM.render(this.element, this.container);
 
-        for (let i = 0; i < visibleTracks.length; i++) {
+        const onChordClick = this.config.onChordClick || defaultOnChordClick;
+        for (let i = 0; i < visibleChordSets.length; i++) {
             this.viewState.session.view.showTrack(this.viewState.config.tracks[i].trackId);
-            if (this.config.onChordClick) {
-                this.viewState.pluginManager.jexl.addFunction('onChordClick', this.config.onChordClick);
+            if (onChordClick) {
+                this.viewState.pluginManager.jexl.addFunction('onChordClick', onChordClick);
                 this.viewState.config.tracks[i].displays[0].onChordClick.set(
                     'jexl:onChordClick(feature, track, pluginManager)'
                 );
@@ -1591,6 +1680,10 @@ function getAlpha(rgba) {
 
 function shortChrName(chrName) {
     return chrName.startsWith("chr") ? chrName.substring(3) : chrName
+}
+
+function defaultOnChordClick(feature, chordTrack, pluginManager) {
+    console.log(feature);
 }
 
 function guid() {

@@ -15,7 +15,8 @@
 </p>
 <p>
     Sniffles:
-    <button id="sifflesLoad">Load</button>
+    <button id="sifflesLoad">Load set 1</button>
+    <button id="sifflesLoad2">Load set 2</button>
 </p>
 <p>
     Delly:
@@ -31,6 +32,7 @@
     import hg19 from "./hg19.js";
     import mm10 from "./mm10.js"
     import snifflesData from "./snifflesTrackData.js";
+    import snifflesData2 from "./snifflesTrackData2.js";
     import dellyData from "./dellyTrackData.js";
 
     const config =
@@ -57,6 +59,7 @@
     document.getElementById("mm10").addEventListener("click", e => circularView.setAssembly(mm10));
 
     document.getElementById("sifflesLoad").addEventListener("click", e => loadTrack(snifflesData));
+    document.getElementById("sifflesLoad2").addEventListener("click", e => loadTrack(snifflesData2));
     document.getElementById("dellyLoad").addEventListener("click", e => loadTrack(dellyData));
 
     function loadTrack(data) {
