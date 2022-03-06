@@ -68,30 +68,6 @@
         circularView.addChords(chords, track);
     }
 
-    function toggleTrack(e, id) {
-        const t = circularView.getTrack(id);
-        if(t) {
-            // Toggle visibility
-            if (t.visible) {
-                circularView.hideTrack(id);
-                e.target.innerText = "Show"
-            } else {
-                circularView.showTrack(id);
-                e.target.innerText = "Hide";
-            }
-        }
-    }
-
-    function colorTrack(id) {
-        const color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`;
-        circularView.setTrackColor(id, color);
-    }
-
-    function alphaTrack(id, value) {
-        const alpha = Number(value);
-        circularView.setTrackAlpha(id, alpha);
-    }
-
 
 </script>
 

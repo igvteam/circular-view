@@ -1,6 +1,6 @@
 {
   "name": "circular-view",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "JBrowse genomic circular view component ",
   "files": [
     "dist/**"
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/igvteam/circular-view.git"
   },
   "keywords": [
-    "igv"
+    "igv", "jbrowse"
   ],
   "author": "Jim Robinson <jrobinso@ucsd.edu>",
   "license": "MIT",

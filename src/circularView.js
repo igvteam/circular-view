@@ -86,9 +86,8 @@ class CircularView {
         buttonContainer.appendChild(this.showControlsButton)
         this.showControlsButton.innerText = 'none' === this.controlPanel.style.display ? 'Show Controls' : 'Hide Controls'
         this.showControlsButton.addEventListener('click', (event) => {
-            const trackPanelRows = this.controlPanel.querySelectorAll('div')
-            if (trackPanelRows.length > 0) {
-
+            const panelRows = this.controlPanel.querySelectorAll('div')
+            if (panelRows.length > 0) {
                 if ('none' === this.controlPanel.style.display) {
                     this.controlPanel.style.display = 'flex'
                     event.target.innerText = 'Hide Controls'
@@ -172,10 +171,10 @@ class CircularView {
         hideShowButton.innerText = true === chordSet.visible ? 'Hide' : 'Show'
         hideShowButton.addEventListener('click', event => {
             if (true === chordSet.visible) {
-                this.hideTrack(chordSet.name)
+                this.hideChordSet(chordSet.name)
                 event.target.innerText = "Show"
             } else {
-                this.showTrack(chordSet.name)
+                this.showChordSet(chordSet.name)
                 event.target.innerText = "Hide"
             }
         })
@@ -199,7 +198,7 @@ class CircularView {
                 color: chordSet.color,
                 onChange: ({rgbaString}) => {
                     colorPickerButton.style.backgroundColor = setAlpha(rgbaString, 1)
-                    this.setTrackColor(chordSet.name, rgbaString)
+                    this.setColor(chordSet.name, rgbaString)
                     alphaSlider.value = alphaToValue(getAlpha(chordSet.color))
                 }
             }
@@ -217,7 +216,7 @@ class CircularView {
         alphaSlider.value = alphaToValue(getAlpha(chordSet.color))
         alphaSlider.oninput = () => {
             const v = valueToAlpha(alphaSlider.value)
-            this.setTrackColor(chordSet.name, setAlpha(chordSet.color, v))
+            this.setColor(chordSet.name, setAlpha(chordSet.color, v))
             picker.setColor(chordSet.color)
         }
         row.appendChild(alphaSlider)
@@ -303,7 +302,7 @@ class CircularView {
 
     addChords(newChords, options = {}) {
 
-        const tmp = options.track || options.name || "*"
+        const tmp = options.name || options.track || "*"
         const trackName = tmp.split(' ')[0].replaceAll("%20", " ")
         const chordSetName = tmp.replaceAll("%20", " ")
 
@@ -356,21 +355,6 @@ class CircularView {
         this.viewState.pluginManager.rootModel.session.clearSelection()
     }
 
-    getFeature(featureId) {
-
-        // TODO -- broken
-        // const display = this.viewState.pluginManager.rootModel.session.view.tracks[0].displays[0]
-        // const feature = display.data.features.get(featureId)
-        // return feature;
-
-        const features = [...this.viewState.config.tracks[0].adapter.features.value]
-        for (let f of features) {
-            if (featureId === f.uniqueId) {
-                return f
-            }
-        }
-    }
-
     /**
      * Deprecated, use "visible" property
      */
@@ -393,23 +377,23 @@ class CircularView {
         this.parent.style.display = isVisible ? 'block' : 'none'
     }
 
-    hideTrack(trackName) {
-        let track = this.getTrack(trackName)
-        if (track) {
-            track.visible = false
+    hideChordSet(trackName) {
+        let cs = this.getChordSet(trackName)
+        if (cs) {
+            cs.visible = false
             this.render()
         } else {
             console.warn(`No track with name: ${name}`)
         }
     }
 
-    showTrack(trackName) {
-        let track = this.getTrack(trackName)
-        if (track) {
-            track.visible = true
+    showChordSet(name) {
+        let cs = this.getChordSet(name)
+        if (cs) {
+            cs.visible = true
             this.render()
         } else {
-            console.warn(`No track with name: ${trackName}`)
+            console.warn(`No track with name: ${name}`)
         }
     }
 
@@ -435,12 +419,12 @@ class CircularView {
         this.render()
     }
 
-    getTrack(name) {
+    getChordSet(name) {
         return this.groupByTrack ? this.chordManager.getTrack(name) : this.chordManager.getChordset(name)
     }
 
-    setTrackColor(name, color) {
-        const t = this.getTrack(name)
+    setColor(name, color) {
+        const t = this.getChordSet(name)
         if (t) {
             t.color = color
             const trackID = t.id
@@ -466,8 +450,6 @@ class CircularView {
 
         // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
         ReactDOM.unmountComponentAtNode(this.container)
-
-
 
         const visibleChordSets =
             (this.groupByTrack ? this.chordManager.tracks : this.chordManager.chordSets).filter(t => t.visible)

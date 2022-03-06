@@ -31,7 +31,7 @@ class ChordSetManager {
         return this.tracks.find(t => name === t.name)
     }
 
-    getChordset(name) {
+    getChordSet(name) {
         return this.chordSets.find(cs => name === cs.name)
     }
 
