@@ -1565,7 +1565,7 @@ class CircularView {
     }
 
     getChordSet(name) {
-        return this.groupByTrack ? this.chordManager.getTrack(name) : this.chordManager.getChordset(name)
+        return this.groupByTrack ? this.chordManager.getTrack(name) : this.chordManager.getChordSet(name)
     }
 
     setColor(name, color) {
