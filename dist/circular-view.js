@@ -1113,7 +1113,7 @@ class ChordSetManager {
         return this.tracks.find(t => name === t.name)
     }
 
-    getChordset(name) {
+    getChordSet(name) {
         return this.chordSets.find(cs => name === cs.name)
     }
 
@@ -1231,9 +1231,8 @@ class CircularView {
         buttonContainer.appendChild(this.showControlsButton);
         this.showControlsButton.innerText = 'none' === this.controlPanel.style.display ? 'Show Controls' : 'Hide Controls';
         this.showControlsButton.addEventListener('click', (event) => {
-            const trackPanelRows = this.controlPanel.querySelectorAll('div');
-            if (trackPanelRows.length > 0) {
-
+            const panelRows = this.controlPanel.querySelectorAll('div');
+            if (panelRows.length > 0) {
                 if ('none' === this.controlPanel.style.display) {
                     this.controlPanel.style.display = 'flex';
                     event.target.innerText = 'Hide Controls';
@@ -1317,10 +1316,10 @@ class CircularView {
         hideShowButton.innerText = true === chordSet.visible ? 'Hide' : 'Show';
         hideShowButton.addEventListener('click', event => {
             if (true === chordSet.visible) {
-                this.hideTrack(chordSet.name);
+                this.hideChordSet(chordSet.name);
                 event.target.innerText = "Show";
             } else {
-                this.showTrack(chordSet.name);
+                this.showChordSet(chordSet.name);
                 event.target.innerText = "Hide";
             }
         });
@@ -1344,7 +1343,7 @@ class CircularView {
                 color: chordSet.color,
                 onChange: ({rgbaString}) => {
                     colorPickerButton.style.backgroundColor = setAlpha(rgbaString, 1);
-                    this.setTrackColor(chordSet.name, rgbaString);
+                    this.setColor(chordSet.name, rgbaString);
                     alphaSlider.value = alphaToValue(getAlpha(chordSet.color));
                 }
             };
@@ -1362,7 +1361,7 @@ class CircularView {
         alphaSlider.value = alphaToValue(getAlpha(chordSet.color));
         alphaSlider.oninput = () => {
             const v = valueToAlpha(alphaSlider.value);
-            this.setTrackColor(chordSet.name, setAlpha(chordSet.color, v));
+            this.setColor(chordSet.name, setAlpha(chordSet.color, v));
             picker.setColor(chordSet.color);
         };
         row.appendChild(alphaSlider);
@@ -1448,7 +1447,7 @@ class CircularView {
 
     addChords(newChords, options = {}) {
 
-        const tmp = options.track || options.name || "*";
+        const tmp = options.name || options.track || "*";
         const trackName = tmp.split(' ')[0].replaceAll("%20", " ");
         const chordSetName = tmp.replaceAll("%20", " ");
 
@@ -1501,21 +1500,6 @@ class CircularView {
         this.viewState.pluginManager.rootModel.session.clearSelection();
     }
 
-    getFeature(featureId) {
-
-        // TODO -- broken
-        // const display = this.viewState.pluginManager.rootModel.session.view.tracks[0].displays[0]
-        // const feature = display.data.features.get(featureId)
-        // return feature;
-
-        const features = [...this.viewState.config.tracks[0].adapter.features.value];
-        for (let f of features) {
-            if (featureId === f.uniqueId) {
-                return f
-            }
-        }
-    }
-
     /**
      * Deprecated, use "visible" property
      */
@@ -1538,23 +1522,23 @@ class CircularView {
         this.parent.style.display = isVisible ? 'block' : 'none';
     }
 
-    hideTrack(trackName) {
-        let track = this.getTrack(trackName);
-        if (track) {
-            track.visible = false;
+    hideChordSet(trackName) {
+        let cs = this.getChordSet(trackName);
+        if (cs) {
+            cs.visible = false;
             this.render();
         } else {
             console.warn(`No track with name: ${name}`);
         }
     }
 
-    showTrack(trackName) {
-        let track = this.getTrack(trackName);
-        if (track) {
-            track.visible = true;
+    showChordSet(name) {
+        let cs = this.getChordSet(name);
+        if (cs) {
+            cs.visible = true;
             this.render();
         } else {
-            console.warn(`No track with name: ${trackName}`);
+            console.warn(`No track with name: ${name}`);
         }
     }
 
@@ -1580,12 +1564,12 @@ class CircularView {
         this.render();
     }
 
-    getTrack(name) {
+    getChordSet(name) {
         return this.groupByTrack ? this.chordManager.getTrack(name) : this.chordManager.getChordset(name)
     }
 
-    setTrackColor(name, color) {
-        const t = this.getTrack(name);
+    setColor(name, color) {
+        const t = this.getChordSet(name);
         if (t) {
             t.color = color;
             const trackID = t.id;
@@ -1611,8 +1595,6 @@ class CircularView {
 
         // Remove all children from possible previous renders.  React might do this for us when we render, but just in case.
         ReactDOM.unmountComponentAtNode(this.container);
-
-
 
         const visibleChordSets =
             (this.groupByTrack ? this.chordManager.tracks : this.chordManager.chordSets).filter(t => t.visible);
@@ -1692,7 +1674,7 @@ function guid() {
 
 function embedCSS() {
 
-    const css =  '.igv-circview-container {\n  z-index: 2048;\n  position: absolute;\n  width: fit-content;\n  height: fit-content;\n  box-sizing: content-box;\n  color: dimgray;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  background-color: white;\n  border-color: dimgray;\n  border-style: solid;\n  border-width: thin;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n\n.igv-circview-toolbar {\n  position: relative;\n  width: 100%;\n  height: 32px;\n  background-color: lightgrey;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.igv-circview-toolbar-button-container {\n  height: 100%;\n  width: fit-content;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-toolbar-button-container > div {\n  margin: 4px;\n}\n\n.igv-circview-track-panel {\n  z-index: 1024;\n  position: absolute;\n  top: 33px;\n  left: 0;\n  width: 100%;\n  height: fit-content;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  background-color: white;\n  display: flex;\n  flex-flow: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n.igv-circview-track-panel > div {\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-track-panel > div > div {\n  margin: 4px;\n}\n\n.igv-circview-swatch-button {\n  cursor: pointer;\n  padding: 5px;\n  width: 8px;\n  height: 8px;\n  border: 1px solid #8d8b8b;\n  border-radius: 16px;\n}\n\n.igv-circview-button {\n  cursor: pointer;\n  padding: 5px;\n  color: #444;\n  vertical-align: middle;\n  text-align: center;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  border: 1px solid #8d8b8b;\n  border-radius: 4px;\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);\n}\n\n.igv-circview-button:hover {\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n.igv-circview-button:active {\n  color: #007bff;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n/*# sourceMappingURL=circular-view.css.map */\n';
+    const css =  '.igv-circview-container {\n  z-index: 2048;\n  width: fit-content;\n  height: fit-content;\n  box-sizing: content-box;\n  color: dimgray;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  background-color: white;\n  border-color: dimgray;\n  border-style: solid;\n  border-width: thin;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n\n.igv-circview-toolbar {\n  position: relative;\n  width: 100%;\n  height: 32px;\n  background-color: lightgrey;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: space-between;\n  align-items: center;\n}\n\n.igv-circview-toolbar-button-container {\n  height: 100%;\n  width: fit-content;\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-toolbar-button-container > div {\n  margin: 4px;\n}\n\n.igv-circview-track-panel {\n  z-index: 1024;\n  position: absolute;\n  top: 33px;\n  left: 0;\n  width: 100%;\n  height: fit-content;\n  border-bottom-style: solid;\n  border-bottom-color: dimgray;\n  border-bottom-width: thin;\n  background-color: white;\n  display: flex;\n  flex-flow: column;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: flex-start;\n}\n.igv-circview-track-panel > div {\n  display: flex;\n  flex-flow: row;\n  flex-wrap: nowrap;\n  justify-content: flex-start;\n  align-items: center;\n}\n.igv-circview-track-panel > div > div {\n  margin: 4px;\n}\n\n.igv-circview-swatch-button {\n  cursor: pointer;\n  padding: 5px;\n  width: 8px;\n  height: 8px;\n  border: 1px solid #8d8b8b;\n  border-radius: 16px;\n}\n\n.igv-circview-button {\n  cursor: pointer;\n  padding: 5px;\n  color: #444;\n  vertical-align: middle;\n  text-align: center;\n  font-family: \"Open Sans\", sans-serif;\n  font-size: 12px;\n  border: 1px solid #8d8b8b;\n  border-radius: 4px;\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);\n}\n\n.igv-circview-button:hover {\n  background: #efefef;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n.igv-circview-button:active {\n  color: #007bff;\n  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);\n}\n\n/*# sourceMappingURL=circular-view.css.map */\n';
 
     const style = document.createElement('style');
     style.setAttribute('type', 'text/css');

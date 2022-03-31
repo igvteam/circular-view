@@ -1,6 +1,6 @@
 {
   "name": "circular-view",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "JBrowse genomic circular view component ",
   "files": [
     "dist/**"

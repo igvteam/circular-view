@@ -1,6 +1,5 @@
 .igv-circview-container {
   z-index: 2048;
-  position: absolute;
   width: fit-content;
   height: fit-content;
   box-sizing: content-box;
