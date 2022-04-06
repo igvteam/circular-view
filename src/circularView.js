@@ -236,11 +236,13 @@ class CircularView {
      */
     setAssembly(igvGenome) {
 
-        if (this.genomeId === igvGenome.id) {
+        const id = this.genomeId || guid()
+
+        if (this.genomeId === id) {
             return
         }
         this.chordManager.clearChords()
-        this.genomeId = igvGenome.id
+        this.genomeId = id
         this.chrNames = new Set(igvGenome.chromosomes.map(chr => shortChrName(chr.name)))
 
         const regions = []
@@ -261,7 +263,7 @@ class CircularView {
         this.assembly = {
             name: igvGenome.name,
             sequence: {
-                trackId: igvGenome.id,
+                trackId: id,
                 type: 'ReferenceSequenceTrack',
                 adapter: {
                     type: 'FromConfigSequenceAdapter',
