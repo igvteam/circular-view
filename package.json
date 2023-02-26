@@ -7,7 +7,7 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "node scripts/generateEmbedCss.js && npx rollup --config",
+    "build": "node scripts/generateEmbedCss.js && npx rollup --config"
   },
   "repository": {
     "type": "git",
