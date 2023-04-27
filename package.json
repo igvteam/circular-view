@@ -1,6 +1,6 @@
 {
   "name": "circular-view",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "JBrowse genomic circular view component ",
   "type": "module",
   "files": [
